@@ -66,7 +66,7 @@ app.get('/r',function(req,res){
 })
 
 app.get('/off',function(req,res){
-    res.send('OFF !');
+    res.send('OFF TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT!');
     sstrip.off(); 
 })
 
