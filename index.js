@@ -33,11 +33,43 @@ for (var i = 0; i < count['count(*)']; i++) {
     console.log(list.flatId + " : " + list.info);
 }
 */
+pixel = require("node-pixel");
+five = require("johnny-five");
 
+var board = new five.Board(opts);
+var strip = null;
+
+board.on("ready", function() {
+
+    strip = new pixel.Strip({
+        board: this,
+        controller: "FIRMATA",
+        strips: [ {pin: 18, length: 60}, ], // this is preferred form for definition
+        gamma: 2.8, // set to a gamma that works nicely for WS2812
+    });
+
+    strip.on("ready", function() {
+        // do stuff with the strip here.
+    });
+});
 //--------------------------------------------------------//
 app.get('/',function(req,res){
     res.send('HELLO!');
+    strip.colour("teal"); // sets strip to a blue-green color using a named colour
+    strip.show();
 })
+
+app.get('/r',function(req,res){
+    res.send('RED!');
+    strip.colour("rgb(0, 255, 0)"); // sets strip to a blue-green color using a named colour
+    strip.show();
+})
+
+app.get('/off',function(req,res){
+    res.send('OFF !');
+    sstrip.off(); 
+})
+
 
 app.get('/home/:version',(req,res)=>{
     res.send('HOME! &s',req.params.version);
@@ -46,7 +78,7 @@ app.get('/home/:version',(req,res)=>{
 app.get('/db',function(req,res){
     //REACH DB AND GET DATA
     var textF="";
-    list = db.each("SELECT rowid,flatId, info FROM user").get();
+    list = db.prepare("SELECT rowid,flatId, info FROM user").all();
     console.log("User id : "+list.rowid+" - "+list.flatId+" - "+list.info);  
      //DB CLOSE
 
@@ -57,7 +89,10 @@ app.get('/list',(req,res)=>{
     res.sendFile(__dirname+'/static/index.html')
 })
 
-app.get('/add/building/:')
+app.get('/add/building/:buildingId',(erq,res)=>{
+
+
+})
 //--------------------------------------------------------//
 var server = app.listen(8081,"127.0.0.1", function (res,req) {
     var host = server.address().address
