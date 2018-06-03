@@ -11,10 +11,11 @@ app.use(bodyParser.urlencoded({extended:false}));
 //db
 const Database = require('better-sqlite3');
 const db = new Database('./db.sqlite');
-
 //Others
 const bodyParsser=require('body-parser');
 
+//Lists
+var flatIdList=[]
 //Checks if variable exists or not
 function isset(accessor){
 	try{
@@ -24,6 +25,14 @@ function isset(accessor){
 		return false;
 	}
 }
+
+//-----------------------------------------------------------//
+/* DB MAP
+
+|-- BuildingID --|-- BuildingName --|-- FlatId --|-- LedId --|-- SaleStatus --|
+|------ 2A1 -----|------- A2 -------|----- 5 ----|---- 34 ---|----  onsale ---|
+
+*/
 //-----------------------------------------------------------//
 
 /*
@@ -62,7 +71,7 @@ app.get('/db',function(req,res){
 })
 
 app.get('/list',(req,res)=>{
-    res.sendFile(__dirname+'/static/index.html')
+    res.sendFile(__dirname+'/index.html')
 })
 
 app.get('/add/building/:buildingId',(req,res)=>{
@@ -82,7 +91,7 @@ app.get('/createdb',(erq,res)=>{
 })
 
 //--------------------------------------------------------//
-var server = app.listen(8081,"127.0.0.1", function (res,req) {
+var server = app.listen(12356,"127.0.0.1", function (res,req) {
     var host = server.address().address
     var port = server.address().port
     
@@ -96,17 +105,15 @@ var server = app.listen(8081,"127.0.0.1", function (res,req) {
     var check;
     var ROWID=null;
     var stmt = db.prepare("INSERT INTO user VALUES ("+ROWID+",?,?)");
-    for (var i = 0; i < 50; i++) {
+    for (var i = 0; i < 2; i++) {
         var d = new Date();
         var n = d.toLocaleTimeString();
         stmt.run(n,"User"+i);
     }
     var count = db.prepare("SELECT count(*) FROM user").get(); 
-    var list;
-    list = db.prepare("SELECT flatId, info FROM user").all();
-    console.log("Records found : "+list.length);
-    console.log(list[0]);
-
+    flatIdList = db.prepare("SELECT rowid,flatId, info FROM user").all();
+    console.log("Records found : "+flatIdList.length);
+    console.log(flatIdList[0]);
     console.log("Database initialized");
 }
 

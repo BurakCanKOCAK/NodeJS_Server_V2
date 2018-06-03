@@ -13,6 +13,7 @@
     "body-parser": "^1.18.3",
     "cookie-parser": "^1.4.3",
     "express": "^4.16.2",
-    "helmet": "^3.12.1"
+    "helmet": "^3.12.1",
+    "serialport": "^6.2.0"
   }
 }
