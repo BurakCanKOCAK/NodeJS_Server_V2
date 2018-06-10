@@ -10,9 +10,9 @@
             "request": "launch",
             "name": "Launch Program",
             //windows
-            //"program": "${workspaceFolder}\\index.js"
+            "program": "${workspaceFolder}\\index.js"
             //mac
-            "program": "${workspaceFolder}/index.js"
+            //"program": "${workspaceFolder}/index.js"
         }
     ]
 }

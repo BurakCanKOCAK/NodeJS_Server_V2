@@ -64,14 +64,14 @@ app.get('/db',function(req,res){
     //REACH DB AND GET DATA
     var textF="";
     list = db.prepare("SELECT rowid,flatId, info FROM user").all();
-    console.log("User id : "+list.rowid+" - "+list.flatId+" - "+list.info);  
+    console.log("User id : "+list[list.length-1].rowid+" - "+list[list.length-1].flatId+" - "+list[list.length-1].info);  
      //DB CLOSE
 
     res.send(textF); 
 })
 
 app.get('/list',(req,res)=>{
-    res.sendFile(__dirname+'/index.html')
+    res.sendFile(__dirname+'/static/index.html')
 })
 
 app.get('/add/building/:buildingId',(req,res)=>{
@@ -95,7 +95,9 @@ var server = app.listen(12356,"127.0.0.1", function (res,req) {
     var host = server.address().address
     var port = server.address().port
     
-    console.log("Server listening at http://%s:%s", host, port)
+    console.log("==============================================")
+    console.log("SERVER ADDRESS -> http://%s:%s", host, port)
+    console.log("==============================================") 
     initDB();
  })
  
