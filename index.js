@@ -6,8 +6,15 @@ const helmet = require('helmet');
 //express
 var express = require('express');
 var app = express();
+//io
+var server = require('http').Server(app);
+var io = require('socket.io')(server);
+//helmet
 app.use(helmet());
 app.use(bodyParser.urlencoded({extended:false}));
+//cors
+var cors = require('cors');
+app.use(cors());
 //db
 const Database = require('better-sqlite3');
 const db = new Database('./db.sqlite');
@@ -91,7 +98,7 @@ app.get('/createdb',(erq,res)=>{
 })
 
 //--------------------------------------------------------//
-var server = app.listen(12356,"127.0.0.1", function (res,req) {
+/*var server = app.listen(8484,"127.0.0.1", function (res,req) {
     var host = server.address().address
     var port = server.address().port
     
@@ -100,7 +107,8 @@ var server = app.listen(12356,"127.0.0.1", function (res,req) {
     console.log("==============================================") 
     initDB();
  })
- 
+ */
+server.listen(8484);
 
  function initDB(){
     db.prepare("CREATE TABLE if not exists user (ROWID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,flatId INT, info TEXT)").run();
@@ -127,3 +135,21 @@ var server = app.listen(12356,"127.0.0.1", function (res,req) {
         console.log('Database connection closed!');
     });
 }
+
+//io Socket Connection Between Interface and NodeJS
+io.on('connection',function(socket){
+
+    console.log("connect success");
+    
+    //Send data each second
+    setInterval(function(){
+        socket.emit('data',"oneoneone");
+        console.log("ONE SEND");
+    },1000)
+
+    //Receive data when button clicked
+    socket.on("btn_click",function(data){
+        console.log("NODE DATA");
+        console.log(data);
+    })
+})
