@@ -81,6 +81,10 @@ app.get('/list',(req,res)=>{
     res.sendFile(__dirname+'/static/index.html')
 })
 
+app.get('/list2',(req,res)=>{
+    res.sendFile(__dirname+'/static/configure.html')
+})
+
 app.get('/add/building/:buildingId',(req,res)=>{
     let find_token = DB.prepare('INSERT INTO building VALUES (?,?)').get(req.param.buildingId,0);
     if(!isset(()=>find_token))
@@ -93,7 +97,7 @@ app.get('/add/building/:buildingId',(req,res)=>{
     }
 })
 
-app.get('/createdb',(erq,res)=>{
+app.get('/createdb',(req,res)=>{
     db.prepare("CREATE TABLE if not exists building (ROWID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,flatCount INT, buildingName TEXT)").run();
 })
 
@@ -143,7 +147,7 @@ io.on('connection',function(socket){
     
     //Send data each second
     setInterval(function(){
-        socket.emit('data',"oneoneone");
+        socket.emit('data',"\noneoneone");
         console.log("ONE SEND");
     },1000)
 
