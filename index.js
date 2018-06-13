@@ -52,9 +52,9 @@ for (var i = 0; i < count['count(*)']; i++) {
 
 //--------------------------------------------------------//
 app.get('/',function(req,res){
-    res.send('HELLO!');
+    res.send('HELLO!');    
 })
-
+    
 app.get('/r',function(req,res){
     res.send('RED!');
 })
@@ -113,8 +113,11 @@ app.get('/createdb',(req,res)=>{
  })
  */
 server.listen(8484);
+initDB();
 
- function initDB(){
+
+// Functions
+function initDB(){
     db.prepare("CREATE TABLE if not exists user (ROWID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,flatId INT, info TEXT)").run();
     var check;
     var ROWID=null;
@@ -139,17 +142,20 @@ server.listen(8484);
         console.log('Database connection closed!');
     });
 }
+/////////////////////////////////////////////////////
 
 //io Socket Connection Between Interface and NodeJS
 io.on('connection',function(socket){
 
     console.log("connect success");
-    
+    socket.emit('dbValues',flatIdList);
     //Send data each second
+    /*
     setInterval(function(){
         socket.emit('data',"\noneoneone");
         console.log("ONE SEND");
     },1000)
+    */
 
     //Receive data when button clicked
     socket.on("btn_click",function(data){
