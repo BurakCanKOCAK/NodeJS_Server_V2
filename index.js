@@ -11,7 +11,7 @@ var server = require('http').Server(app);
 var io = require('socket.io')(server);
 //helmet
 app.use(helmet());
-app.use(bodyParser.urlencoded({extended:false}));
+app.use(bodyParser.urlencoded({ extended: false }));
 //cors
 var cors = require('cors');
 app.use(cors());
@@ -19,18 +19,18 @@ app.use(cors());
 const Database = require('better-sqlite3');
 const db = new Database('./db.sqlite');
 //Others
-const bodyParsser=require('body-parser');
+const bodyParsser = require('body-parser');
 
 //Lists
-var flatIdList=[]
+var flatIdList = []
 //Checks if variable exists or not
-function isset(accessor){
-	try{
-		return typeof accessor() !== 'undefined';
-	}
-	catch (e){
-		return false;
-	}
+function isset(accessor) {
+    try {
+        return typeof accessor() !== 'undefined';
+    }
+    catch (e) {
+        return false;
+    }
 }
 
 //-----------------------------------------------------------//
@@ -51,55 +51,56 @@ for (var i = 0; i < count['count(*)']; i++) {
 */
 
 //--------------------------------------------------------//
-app.get('/',function(req,res){
-    res.send('HELLO!');    
+app.get('/', function (req, res) {
+    res.send('HELLO!');
 })
-    
-app.get('/r',function(req,res){
+
+app.get('/r', function (req, res) {
     res.send('RED!');
 })
 
-app.get('/off',function(req,res){
+app.get('/off', function (req, res) {
     res.send('OFF !');
 })
 
-app.get('/home/:version',(req,res)=>{
-    res.send('HOME! &s',req.params.version);
+app.get('/home/:version', (req, res) => {
+    res.send('HOME! &s', req.params.version);
 })
 
-app.get('/db',function(req,res){
+app.get('/db', function (req, res) {
     //REACH DB AND GET DATA
-    var textF="";
+    var textF = "";
     list = db.prepare("SELECT rowid,flatId, info FROM user").all();
-    console.log("User id : "+list[list.length-1].rowid+" - "+list[list.length-1].flatId+" - "+list[list.length-1].info);  
-     //DB CLOSE
+    console.log("User id : " + list[list.length - 1].rowid + " - " + list[list.length - 1].flatId + " - " + list[list.length - 1].info);
+    //DB CLOSE
 
-    res.send(textF); 
+res.send(textF);
 })
 
-app.get('/list',(req,res)=>{
-    res.sendFile(__dirname+'/static/index.html')
+app.get('/list', (req, res) => {
+    res.sendFile(__dirname + '/static/index.html')
 })
 
-app.get('/list2',(req,res)=>{
-    res.sendFile(__dirname+'/static/configure.html')
+app.get('/list2', (req, res) => {
+    res.sendFile(__dirname + '/static/configure.html')
+    list = db.prepare("SELECT ledId,flatId, buildingId FROM config").all();
+    console.log(list);
 })
 
-app.get('/add/building/:buildingId',(req,res)=>{
-    let find_token = DB.prepare('INSERT INTO building VALUES (?,?)').get(req.param.buildingId,0);
-    if(!isset(()=>find_token))
-    {
+app.get('/add/building/:buildingId', (req, res) => {
+    let find_token = DB.prepare('INSERT INTO building VALUES (?,?)').get(req.param.buildingId, 0);
+    if (!isset(() => find_token)) {
         res.status(401).send("UserNotLoggedIn");
     }
-    else
-    {
+    else {
         res.status(200).send("created");
     }
 })
 
-app.get('/createdb',(req,res)=>{
-    db.prepare("CREATE TABLE if not exists building (ROWID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,flatCount INT, buildingName TEXT)").run();
+app.get('/createdb', (req, res) => {
+    db.prepare("CREATE TABLE if not exists config (ROWID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,buildingId TEXT,flatId INT,ledId INT )").run();
 })
+
 
 //--------------------------------------------------------//
 /*var server = app.listen(8484,"127.0.0.1", function (res,req) {
@@ -117,27 +118,27 @@ initDB();
 
 
 // Functions
-function initDB(){
+function initDB() {
     db.prepare("CREATE TABLE if not exists user (ROWID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,flatId INT, info TEXT)").run();
     var check;
-    var ROWID=null;
-    var stmt = db.prepare("INSERT INTO user VALUES ("+ROWID+",?,?)");
+    var ROWID = null;
+    var stmt = db.prepare("INSERT INTO user VALUES (" + ROWID + ",?,?)");
     for (var i = 0; i < 2; i++) {
         var d = new Date();
         var n = d.toLocaleTimeString();
-        stmt.run(n,"User"+i);
+        stmt.run(n, "User" + i);
     }
-    var count = db.prepare("SELECT count(*) FROM user").get(); 
+    var count = db.prepare("SELECT count(*) FROM user").get();
     flatIdList = db.prepare("SELECT rowid,flatId, info FROM user").all();
-    console.log("Records found : "+flatIdList.length);
+    console.log("Records found : " + flatIdList.length);
     console.log(flatIdList[0]);
     console.log("Database initialized");
 }
 
- function closeDb() {
+function closeDb() {
     db.close((err) => {
         if (err) {
-          return console.error(err.message);
+            return console.error(err.message);
         }
         console.log('Database connection closed!');
     });
@@ -145,10 +146,10 @@ function initDB(){
 /////////////////////////////////////////////////////
 
 //io Socket Connection Between Interface and NodeJS
-io.on('connection',function(socket){
+io.on('connection', function (socket) {
 
     console.log("connect success");
-    socket.emit('dbValues',flatIdList);
+    socket.emit('dbValues', flatIdList);
     //Send data each second
     /*
     setInterval(function(){
@@ -158,7 +159,7 @@ io.on('connection',function(socket){
     */
 
     //Receive data when button clicked
-    socket.on("btn_click",function(data){
+    socket.on("btn_click", function (data) {
         console.log("NODE DATA");
         console.log(data);
     })

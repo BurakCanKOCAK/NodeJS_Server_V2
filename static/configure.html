@@ -3,7 +3,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
-  crossorigin="anonymous"></script>
+    crossorigin="anonymous"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8/jquery.min.js"></script>
   <script src="//cdnjs.cloudflare.com/ajax/libs/list.js/1.5.0/list.min.js"></script>
@@ -11,31 +11,33 @@
 
 <style>
   body {
-  font-family:sans-serif;
-}
-table td, table th {
-  padding:5px;
-}
+    font-family: sans-serif;
+  }
+
+  table td,
+  table th {
+    padding: 5px;
+  }
 </style>
 
 
 <div class="table-responsive" id="contacts">
-    <table>
-        <td class="name">
-          <input type="hidden" id="id-field" />
-          <input class="form-control input-sm" type="text" id="name-field" placeholder="Building Id" />
-        </td>
-        <td class="age">
-          <input class="form-control input-sm" type="text" id="age-field" placeholder="Flat Id" />
-        </td>
-        <td class="city">
-          <input class="form-control input-sm" type="text" id="city-field" placeholder="Led Id" />
-        </td>
-        <td class="add">
-          <button id="add-btn">Add</button>
-          <button id="edit-btn">Edit</button>
-        </td>
-      </table>
+  <table>
+    <td class="name">
+      <input type="hidden" id="id-field" />
+      <input class="form-control input-sm" type="text" id="name-field" placeholder="Building Id" />
+    </td>
+    <td class="age">
+      <input class="form-control input-sm" type="text" id="age-field" placeholder="Flat Id" />
+    </td>
+    <td class="city">
+      <input class="form-control input-sm" type="text" id="city-field" placeholder="Led Id" />
+    </td>
+    <td class="add">
+      <button id="add-btn">Add</button>
+      <button id="edit-btn">Edit</button>
+    </td>
+  </table>
   <table class="table table-striped table-hover table-condensed">
     <thead>
       <tr>
@@ -53,70 +55,84 @@ table td, table th {
         <td class="name">A1</td>
         <td class="age">1</td>
         <td class="city">14</td>
-        <td class="edit"><button class="btn btn-warning">Edit</button></td>
-        <td class="remove"><button class="btn btn-danger">Remove</button></td>
+        <td class="edit">
+          <button class="btn btn-warning">Edit</button>
+        </td>
+        <td class="remove">
+          <button class="btn btn-danger">Remove</button>
+        </td>
       </tr>
       <tr>
         <td class="id" style="display:none;">2</td>
         <td class="name">A2</td>
         <td class="age">2</td>
         <td class="city">15</td>
-        <td class="edit"><button class="btn btn-warning">Edit</button></td>
-        <td class="remove"><button class="btn btn-danger">Remove</button></td>
+        <td class="edit">
+          <button class="btn btn-warning">Edit</button>
+        </td>
+        <td class="remove">
+          <button class="btn btn-danger">Remove</button>
+        </td>
       </tr>
       <tr>
         <td class="id" style="display:none;">3</td>
         <td class="name">A1</td>
         <td class="age">3</td>
         <td class="city">16-17</td>
-        <td class="edit"><button class="btn btn-warning">Edit</button></td>
-        <td class="remove"><button class="btn btn-danger">Remove</button></td>
+        <td class="edit">
+          <button class="btn btn-warning">Edit</button>
+        </td>
+        <td class="remove">
+          <button class="btn btn-danger">Remove</button>
+        </td>
       </tr>
       <tr>
         <td class="id" style="display:none;">4</td>
         <td class="name">A2</td>
         <td class="age">1</td>
         <td class="city">18</td>
-        <td class="edit"><button class="btn btn-warning">Edit</button></td>
-        <td class="remove"><button class="btn btn-danger">Remove</button></td>
+        <td class="edit">
+          <button class="btn btn-warning">Edit</button>
+        </td>
+        <td class="remove">
+          <button class="btn btn-danger">Remove</button>
+        </td>
       </tr>
     </tbody>
   </table>
- 
-  
+
+
   <p>Copyright@BBH 2018</p>
 </div>
 
 <body>
-  
+  <!--SOCKET.IO !-->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.js"></script>
 
-    <!--SOCKET.IO !-->    
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.js"></script>
-
-
-    <script>
-      var options = {
-      valueNames: [ 'id', 'name', 'age', 'city' ]
+  <script>
+    var options = {
+      valueNames: ['id', 'name', 'age', 'city']
     };
 
     // Init list
     var contactList = new List('contacts', options);
 
     var idField = $('#id-field'),
-        nameField = $('#name-field'),
-        ageField = $('#age-field'),
-        cityField = $('#city-field'),
-        addBtn = $('#add-btn'),
-        editBtn = $('#edit-btn').hide(),
-        removeBtns = $('.btn-danger'),
-        editBtns = $('.btn-warning');
+      nameField = $('#name-field'),
+      ageField = $('#age-field'),
+      cityField = $('#city-field'),
+      addBtn = $('#add-btn'),
+      editBtn = $('#edit-btn').hide(),
+      removeBtns = $('.btn-danger'),
+      editBtns = $('.btn-warning');
 
     // Sets callbacks to the buttons in the list
     refreshCallbacks();
 
-    addBtn.click(function() {
+    //Add button
+    addBtn.click(function () {
       contactList.add({
-        id: Math.floor(Math.random()*110000),
+        id: Math.floor(Math.random() * 110000),
         name: nameField.val(),
         age: ageField.val(),
         city: cityField.val()
@@ -124,11 +140,12 @@ table td, table th {
       clearFields();
       refreshCallbacks();
     });
-
-    editBtn.click(function() {
+    
+    //Edit button
+    editBtn.click(function () {
       var item = contactList.get('id', idField.val())[0];
       item.values({
-        id:idField.val(),
+        id: idField.val(),
         name: nameField.val(),
         age: ageField.val(),
         city: cityField.val()
@@ -138,24 +155,24 @@ table td, table th {
       addBtn.show();
     });
 
+    // Needed to add new buttons to jQuery-extended object
     function refreshCallbacks() {
-      // Needed to add new buttons to jQuery-extended object
       removeBtns = $(removeBtns.selector);
       editBtns = $(editBtns.selector);
-      
-      removeBtns.click(function() {
+
+      removeBtns.click(function () {
         var itemId = $(this).closest('tr').find('.id').text();
         contactList.remove('id', itemId);
       });
-      
-      editBtns.click(function() {
+
+      editBtns.click(function () {
         var itemId = $(this).closest('tr').find('.id').text();
         var itemValues = contactList.get('id', itemId)[0].values();
         idField.val(itemValues.id);
         nameField.val(itemValues.name);
         ageField.val(itemValues.age);
         cityField.val(itemValues.city);
-        
+
         editBtn.show();
         addBtn.hide();
       });
@@ -166,40 +183,41 @@ table td, table th {
       ageField.val('');
       cityField.val('');
     }
-    </script>
+  </script>
 
-<!--AJAX + JS SCRIPT !-->
-<script>
+
+  <!--AJAX + JS SCRIPT  For Socket.io!-->
+  <script>
     var socket = io('http://127.0.0.1:8484');
     var server_address = "http://127.0.0.1:8484"
-    
+
     //When data arrives on socket.io
     socket.on('data', function (data) {
       console.log("DATA FROM SOCKET");
       console.log(data);
       $("#text").append(data);
     });
-  
-    socket.on('dbValues',function(data){
+
+    socket.on('dbValues', function (data) {
       console.log(data);
       contactList.add({
-      id: Math.floor(Math.random()*110000),
-      name: data[0]["flatId"],
-      age: data[0]["ROWID"],
-      city: data[0]["info"]
+        id: Math.floor(Math.random() * 110000),
+        name: data[0]["flatId"],
+        age: data[0]["ROWID"],
+        city: data[0]["info"]
       });
       clearFields();
       refreshCallbacks();
     });
 
     //When hmtl file loaded
-    $(document).ready(function(){
-      $("#button").click(function(){
+    $(document).ready(function () {
+      $("#button").click(function () {
         var input_val = $("#input_holder").val();
-        
+
         //Send data to nodejs using socket.io
-        socket.emit('btn_click',{data:input_val});
-        
+        socket.emit('btn_click', { data: input_val });
+
         /*
         //Send data to nodejs using ajax
         $.ajax({
@@ -216,8 +234,8 @@ table td, table th {
           console.log(data);
         })
         */
-       
+
       })
     });
   </script>
-  </body>
+</body>
