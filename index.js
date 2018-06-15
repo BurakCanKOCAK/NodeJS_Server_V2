@@ -97,11 +97,6 @@ app.get('/add/building/:buildingId', (req, res) => {
     }
 })
 
-app.get('/createdb', (req, res) => {
-    db.prepare("CREATE TABLE if not exists config (ROWID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,buildingId TEXT,flatId INT,ledId INT )").run();
-})
-
-
 //--------------------------------------------------------//
 /*var server = app.listen(8484,"127.0.0.1", function (res,req) {
     var host = server.address().address
@@ -120,6 +115,7 @@ initDB();
 // Functions
 function initDB() {
     db.prepare("CREATE TABLE if not exists user (ROWID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,flatId INT, info TEXT)").run();
+    db.prepare("CREATE TABLE if not exists config (ROWID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,buildingId TEXT,flatId INT,ledId INT )").run();
     var check;
     var ROWID = null;
     var stmt = db.prepare("INSERT INTO user VALUES (" + ROWID + ",?,?)");
