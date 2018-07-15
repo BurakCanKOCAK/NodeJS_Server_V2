@@ -9,6 +9,10 @@ var app = express();
 //io
 var server = require('http').Server(app);
 var io = require('socket.io')(server);
+//SerialPort
+//var serialport = require("serialport");
+//var serialPort = serialport.SerialPort;
+//var portName = process.argb[2];
 //helmet
 app.use(helmet());
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -32,6 +36,7 @@ function isset(accessor) {
         return false;
     }
 }
+//SerialPort configuration
 
 //-----------------------------------------------------------//
 /* DB MAP
@@ -88,7 +93,7 @@ app.get('/list2', (req, res) => {
 })
 
 app.get('/add/building/:buildingId', (req, res) => {
-    let find_token = DB.prepare('INSERT INTO building VALUES (?,?)').get(req.param.buildingId, 0);
+    let find_token = db.prepare('INSERT INTO config VALUES (?,?,1,1)').run(req.param.buildingId, 0);
     if (!isset(() => find_token)) {
         res.status(401).send("UserNotLoggedIn");
     }
@@ -115,7 +120,7 @@ initDB();
 // Functions
 function initDB() {
     db.prepare("CREATE TABLE if not exists user (ROWID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,flatId INT, info TEXT)").run();
-    db.prepare("CREATE TABLE if not exists config (ROWID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,buildingId TEXT,flatId INT,ledId INT )").run();
+    db.prepare("CREATE TABLE if not exists config (buildingId TEXT,flatId INT,ledId INTEGER PRIMARY KEY NOT NULL)").run();
     var check;
     var ROWID = null;
     var stmt = db.prepare("INSERT INTO user VALUES (" + ROWID + ",?,?)");
@@ -145,7 +150,7 @@ function closeDb() {
 io.on('connection', function (socket) {
 
     console.log("connect success");
-    socket.emit('dbValues', flatIdList);
+    socket.emit('dbValues', db.prepare("SELECT ledId,flatId, buildingId FROM config").all());
     //Send data each second
     /*
     setInterval(function(){
@@ -158,5 +163,10 @@ io.on('connection', function (socket) {
     socket.on("btn_click", function (data) {
         console.log("NODE DATA");
         console.log(data);
+    })
+
+    socket.on("led_add",function(data){
+        console.log(data);
+        db.prepare('INSERT INTO config VALUES (?,?,?)').run(data.buildingId,data.flatId,data.ledId);
     })
 })

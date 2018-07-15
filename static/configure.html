@@ -62,42 +62,7 @@
           <button class="btn btn-danger">Remove</button>
         </td>
       </tr>
-      <tr>
-        <td class="id" style="display:none;">2</td>
-        <td class="name">A2</td>
-        <td class="age">2</td>
-        <td class="city">15</td>
-        <td class="edit">
-          <button class="btn btn-warning">Edit</button>
-        </td>
-        <td class="remove">
-          <button class="btn btn-danger">Remove</button>
-        </td>
-      </tr>
-      <tr>
-        <td class="id" style="display:none;">3</td>
-        <td class="name">A1</td>
-        <td class="age">3</td>
-        <td class="city">16-17</td>
-        <td class="edit">
-          <button class="btn btn-warning">Edit</button>
-        </td>
-        <td class="remove">
-          <button class="btn btn-danger">Remove</button>
-        </td>
-      </tr>
-      <tr>
-        <td class="id" style="display:none;">4</td>
-        <td class="name">A2</td>
-        <td class="age">1</td>
-        <td class="city">18</td>
-        <td class="edit">
-          <button class="btn btn-warning">Edit</button>
-        </td>
-        <td class="remove">
-          <button class="btn btn-danger">Remove</button>
-        </td>
-      </tr>
+     
     </tbody>
   </table>
 
@@ -137,6 +102,7 @@
         age: ageField.val(),
         city: cityField.val()
       });
+      socket.emit('led_add', { buildingId : nameField.val(),flatId:ageField.val(),ledId:cityField.val() });
       clearFields();
       refreshCallbacks();
     });
@@ -200,42 +166,17 @@
 
     socket.on('dbValues', function (data) {
       console.log(data);
-      contactList.add({
+      data.forEach(element => {
+        contactList.add({
         id: Math.floor(Math.random() * 110000),
-        name: data[0]["flatId"],
-        age: data[0]["ROWID"],
-        city: data[0]["info"]
+        name: element["buildingId"],
+        age: element["flatId"],
+        city: element["ledId"]
+        });
       });
       clearFields();
       refreshCallbacks();
     });
 
-    //When hmtl file loaded
-    $(document).ready(function () {
-      $("#button").click(function () {
-        var input_val = $("#input_holder").val();
-
-        //Send data to nodejs using socket.io
-        socket.emit('btn_click', { data: input_val });
-
-        /*
-        //Send data to nodejs using ajax
-        $.ajax({
-          url:server_address+"/db",
-          type:"GET",
-          contentType:"application/json",
-        })
-        .done(function(data){
-          console.log("SUCCESS");
-          $("#text").text(JSON.stringify(data));
-        })
-        .fail(function(data){
-          console.log("ERROR");
-          console.log(data);
-        })
-        */
-
-      })
-    });
   </script>
 </body>
