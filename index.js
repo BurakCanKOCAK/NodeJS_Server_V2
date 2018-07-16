@@ -169,4 +169,9 @@ io.on('connection', function (socket) {
         console.log(data);
         db.prepare('INSERT INTO config VALUES (?,?,?)').run(data.buildingId,data.flatId,data.ledId);
     })
+
+    socket.on("led_remove",function(data){
+        console.log(data);
+        db.prepare('DELETE FROM config WHERE buildingId=? AND flatId=? AND ledId=?').run(data.buildingId,data.flatId,data.ledId);
+    })
 })
