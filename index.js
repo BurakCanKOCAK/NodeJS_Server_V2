@@ -150,7 +150,7 @@ function closeDb() {
 io.on('connection', function (socket) {
 
     console.log("connect success");
-    socket.emit('dbValues', db.prepare("SELECT ledId,flatId, buildingId FROM config").all());
+    socket.emit('dbValues', db.prepare("SELECT ledId,flatId, buildingId FROM config ORDER BY buildingId").all());
     //Send data each second
     /*
     setInterval(function(){
@@ -166,12 +166,12 @@ io.on('connection', function (socket) {
     })
 
     socket.on("led_add",function(data){
-        console.log(data);
+        console.log("Row added : [ buildingId : "+data.buildingId +", flatId : "+ data.flatId +", ledId : "+ data.ledId+" ]");
         db.prepare('INSERT INTO config VALUES (?,?,?)').run(data.buildingId,data.flatId,data.ledId);
     })
 
     socket.on("led_remove",function(data){
-        console.log(data);
+        console.log("Row deleted : [ buildingId : "+data.buildingId +", flatId : "+ data.flatId +", ledId : "+ data.ledId+" ]");
         db.prepare('DELETE FROM config WHERE buildingId=? AND flatId=? AND ledId=?').run(data.buildingId,data.flatId,data.ledId);
     })
 })
