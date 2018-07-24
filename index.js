@@ -165,6 +165,11 @@ io.on('connection', function (socket) {
         console.log(data);
     })
 
+    socket.on("error_msg",function(data){
+        //Emits error messages to the frontend
+        console.log(data);    
+    })
+
     socket.on("led_add",function(data){
         console.log("Row added : [ buildingId : "+data.buildingId +", flatId : "+ data.flatId +", ledId : "+ data.ledId+" ]");
         db.prepare('INSERT INTO config VALUES (?,?,?)').run(data.buildingId,data.flatId,data.ledId);

@@ -102,9 +102,10 @@
         flatId: flatIdField.val(),
         ledId: ledIdField.val()
       });
-      socket.emit('led_add', { buildingId : buildingIdField.val(),flatId:flatIdField.val(),ledId:ledIdField.val() });
+      socket.emit('led_add', { buildingId : buildingIdField.val().trim(),flatId:flatIdField.val().trim(),ledId:ledIdField.val().trim() });
       clearFields();
       refreshCallbacks();
+      location.reload();
     });
     
     //Edit button
@@ -139,6 +140,7 @@
         console.log(contactList.items);
         contactList.remove('id', itemId);
         socket.emit('led_remove', { buildingId : list_item.buildingId,flatId:list_item.flatId,ledId:list_item.ledId});
+        location.reload();
       });
 
       editBtns.click(function () {
