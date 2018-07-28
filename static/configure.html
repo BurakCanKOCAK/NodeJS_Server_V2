@@ -51,7 +51,7 @@
     </thead>
     <tbody class="list">
       <tr>
-        <td class="id" style="display:none;">999999</td>
+        <td class="id" style="display:none;">999998</td>
         <td class="buildingId">Test</td>
         <td class="flatId">Test</td>
         <td class="ledId">1</td>
@@ -63,7 +63,7 @@
         </td>
       </tr>
       <tr>
-        <td class="id" style="display:none;">999998</td>
+        <td class="id" style="display:none;">999999</td>
         <td class="buildingId">1</td>
         <td class="flatId">1</td>
         <td class="ledId">2</td>
@@ -186,8 +186,8 @@
 
   <!--AJAX + JS SCRIPT  For Socket.io!-->
   <script>
-    var socket = io('http://127.0.0.1:8484');
-    var server_address = "http://127.0.0.1:8484"
+    var socket = io('http://localhost:8484');
+    var server_address = "http://localhost:8484"
 
     //When data arrives on socket.io
     socket.on('data', function (data) {
