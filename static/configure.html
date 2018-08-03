@@ -50,20 +50,8 @@
       </tr>
     </thead>
     <tbody class="list">
-      <tr>
-        <td class="id" style="display:none;">999998</td>
-        <td class="buildingId">Test</td>
-        <td class="flatId">Test</td>
-        <td class="ledId">1</td>
-        <td class="edit">
-          <button class="btn btn-warning">Edit</button>
-        </td>
-        <td class="remove">
-          <button class="btn btn-danger">Remove</button>
-        </td>
-      </tr>
-      <tr>
-        <td class="id" style="display:none;">999999</td>
+      <tr id="999999">
+        <td class="id" style="display: none">999999</td>
         <td class="buildingId">1</td>
         <td class="flatId">1</td>
         <td class="ledId">2</td>
@@ -152,7 +140,7 @@
         console.log(contactList.items);
         contactList.remove('id', itemId);
         socket.emit('led_remove', { buildingId : list_item.buildingId,flatId:list_item.flatId,ledId:list_item.ledId});
-        location.reload();
+        //location.reload();
       });
 
       editBtns.click(function () {
@@ -198,6 +186,8 @@
 
     socket.on('dbValues', function (data) {
       console.log(data);
+      var result_style = document.getElementById('999999').style;
+      result_style.display = 'none';
       data.forEach(element => {
         contactList.add({
         id: element["ledId"],
@@ -206,7 +196,6 @@
         ledId: element["ledId"]
         });
       });
-      contactList.remove('id', 999999);
       clearFields();
       refreshCallbacks();
     });

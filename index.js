@@ -82,24 +82,50 @@ app.get('/db', function (req, res) {
 res.send(textF);
 })
 
-app.get('/list', (req, res) => {
+/*app.get('/list', (req, res) => {
     res.sendFile(__dirname + '/static/index.html')
-})
+})*/
 
-app.get('/list2', (req, res) => {
+app.get('/configure', (req, res) => {
     res.sendFile(__dirname + '/static/configure.html')
-    list = db.prepare("SELECT ledId,flatId, buildingId FROM config").all();
+    list = db.prepare("SELECT ledId,flatId, buildingId FROM modelData").all();
     console.log(list);
 })
 
 app.get('/add/building/:buildingId', (req, res) => {
-    let find_token = db.prepare('INSERT INTO config VALUES (?,?,1,1)').run(req.param.buildingId, 0);
+    let find_token = db.prepare('INSERT INTO modelData VALUES (?,?,1,1)').run(req.param.buildingId, 0);
     if (!isset(() => find_token)) {
         res.status(401).send("UserNotLoggedIn");
     }
     else {
         res.status(200).send("created");
     }
+})
+
+
+// ALL ON
+app.get('/api/allon', (req, res) => {
+    //Send 6
+})
+
+// ALL OFF
+app.get('/api/alloff', (req, res) => {
+    res.sendFile(__dirname + '/static/index.html')
+})
+
+// SHOW ONSALE
+app.get('/api/show/onsale', (req, res) => {
+    res.sendFile(__dirname + '/static/index.html')
+})
+
+// EFFECT
+app.get('/api/show/effect', (req, res) => {
+    res.sendFile(__dirname + '/static/index.html')
+})
+
+// FLAT ON-OFF-SELL-ONSALE
+app.get('/list', (req, res) => {
+    res.sendFile(__dirname + '/static/index.html')
 })
 
 //--------------------------------------------------------//
@@ -120,7 +146,7 @@ initDB();
 // Functions
 function initDB() {
     db.prepare("CREATE TABLE if not exists user (ROWID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,flatId INT, info TEXT)").run();
-    db.prepare("CREATE TABLE if not exists config (buildingId TEXT,flatId INT,ledId INTEGER PRIMARY KEY NOT NULL)").run();
+    db.prepare("CREATE TABLE if not exists modelData (buildingId TEXT,flatId INT,ledId INTEGER PRIMARY KEY NOT NULL, isSold INTEGER DEFAULT 0)").run();
     var check;
     var ROWID = null;
     var stmt = db.prepare("INSERT INTO user VALUES (" + ROWID + ",?,?)");
@@ -150,7 +176,7 @@ function closeDb() {
 io.on('connection', function (socket) {
 
     console.log("connect success");
-    socket.emit('dbValues', db.prepare("SELECT ledId,flatId, buildingId FROM config ORDER BY buildingId").all());
+    socket.emit('dbValues', db.prepare("SELECT ledId,flatId, buildingId FROM modelData ORDER BY buildingId").all());
     //Send data each second
     /*
     setInterval(function(){
@@ -172,11 +198,11 @@ io.on('connection', function (socket) {
 
     socket.on("led_add",function(data){
         console.log("Row added : [ buildingId : "+data.buildingId +", flatId : "+ data.flatId +", ledId : "+ data.ledId+" ]");
-        db.prepare('INSERT INTO config VALUES (?,?,?)').run(data.buildingId,data.flatId,data.ledId);
+        db.prepare('INSERT INTO modelData VALUES (?,?,?)').run(data.buildingId,data.flatId,data.ledId);
     })
 
     socket.on("led_remove",function(data){
         console.log("Row deleted : [ buildingId : "+data.buildingId +", flatId : "+ data.flatId +", ledId : "+ data.ledId+" ]");
-        db.prepare('DELETE FROM config WHERE buildingId=? AND flatId=? AND ledId=?').run(data.buildingId,data.flatId,data.ledId);
+        db.prepare('DELETE FROM modelData WHERE buildingId=? AND flatId=? AND ledId=?').run(data.buildingId,data.flatId,data.ledId);
     })
 })
