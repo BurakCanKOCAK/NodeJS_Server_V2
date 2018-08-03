@@ -1,4 +1,3 @@
-
 //bodyparser
 const bodyParser = require('body-parser');
 //helmet
@@ -10,12 +9,20 @@ var app = express();
 var server = require('http').Server(app);
 var io = require('socket.io')(server);
 //SerialPort
-//var serialport = require("serialport");
-//var serialPort = serialport.SerialPort;
-//var portName = process.argb[2];
+var isSerialPortOpen=False;
+const SerialPort = require('serialport');
+const port = new SerialPort('/dev/ttyUSB0', {
+    baudRate: 115200
+}, () => {
+    console.log('SerialPort Opened');
+    isSerialPortOpen=True
+});
+const parsers = SerialPort.parsers;
 //helmet
 app.use(helmet());
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({
+    extended: false
+}));
 //cors
 var cors = require('cors');
 app.use(cors());
@@ -26,13 +33,15 @@ const db = new Database('./db.sqlite');
 const bodyParsser = require('body-parser');
 
 //Lists
-var flatIdList = []
+var flatIdList = [];
+var databaseCache;
+var saleList = [];
+var flatList = [];
 //Checks if variable exists or not
 function isset(accessor) {
     try {
         return typeof accessor() !== 'undefined';
-    }
-    catch (e) {
+    } catch (e) {
         return false;
     }
 }
@@ -56,20 +65,8 @@ for (var i = 0; i < count['count(*)']; i++) {
 */
 
 //--------------------------------------------------------//
-app.get('/', function (req, res) {
-    res.send('HELLO!');
-})
-
-app.get('/r', function (req, res) {
-    res.send('RED!');
-})
-
-app.get('/off', function (req, res) {
-    res.send('OFF !');
-})
-
 app.get('/home/:version', (req, res) => {
-    res.send('HOME! &s', req.params.version);
+    res.send('HOME! ' + req.params.version);
 })
 
 app.get('/db', function (req, res) {
@@ -79,7 +76,7 @@ app.get('/db', function (req, res) {
     console.log("User id : " + list[list.length - 1].rowid + " - " + list[list.length - 1].flatId + " - " + list[list.length - 1].info);
     //DB CLOSE
 
-res.send(textF);
+    res.send(textF);
 })
 
 /*app.get('/list', (req, res) => {
@@ -96,8 +93,7 @@ app.get('/add/building/:buildingId', (req, res) => {
     let find_token = db.prepare('INSERT INTO modelData VALUES (?,?,1,1)').run(req.param.buildingId, 0);
     if (!isset(() => find_token)) {
         res.status(401).send("UserNotLoggedIn");
-    }
-    else {
+    } else {
         res.status(200).send("created");
     }
 })
@@ -150,15 +146,16 @@ function initDB() {
     var check;
     var ROWID = null;
     var stmt = db.prepare("INSERT INTO user VALUES (" + ROWID + ",?,?)");
-    for (var i = 0; i < 2; i++) {
+    /*for (var i = 0; i < 2; i++) {
         var d = new Date();
         var n = d.toLocaleTimeString();
         stmt.run(n, "User" + i);
     }
-    var count = db.prepare("SELECT count(*) FROM user").get();
-    flatIdList = db.prepare("SELECT rowid,flatId, info FROM user").all();
-    console.log("Records found : " + flatIdList.length);
-    console.log(flatIdList[0]);
+    */
+    //var count = db.prepare("SELECT count(*) FROM user").get();
+    databaseCache = db.prepare("SELECT buildingId,flatId,ledId,isSold FROM modelData").all();
+    console.log("Records found : " + databaseCache.length);
+    console.log(databaseCache[0]);
     console.log("Database initialized");
 }
 
@@ -191,18 +188,20 @@ io.on('connection', function (socket) {
         console.log(data);
     })
 
-    socket.on("error_msg",function(data){
+    socket.on("error_msg", function (data) {
         //Emits error messages to the frontend
-        console.log(data);    
+        console.log(data);
     })
 
-    socket.on("led_add",function(data){
-        console.log("Row added : [ buildingId : "+data.buildingId +", flatId : "+ data.flatId +", ledId : "+ data.ledId+" ]");
-        db.prepare('INSERT INTO modelData VALUES (?,?,?)').run(data.buildingId,data.flatId,data.ledId);
+    socket.on("led_add", function (data) {
+        console.log("Row added : [ buildingId : " + data.buildingId + ", flatId : " + data.flatId + ", ledId : " + data.ledId + " ]");
+        db.prepare('INSERT INTO modelData VALUES (?,?,?,?)').run(data.buildingId, data.flatId, data.ledId, 0);
+        databaseCache = db.prepare("SELECT buildingId,flatId,ledId,isSold FROM modelData").all();
     })
 
-    socket.on("led_remove",function(data){
-        console.log("Row deleted : [ buildingId : "+data.buildingId +", flatId : "+ data.flatId +", ledId : "+ data.ledId+" ]");
-        db.prepare('DELETE FROM modelData WHERE buildingId=? AND flatId=? AND ledId=?').run(data.buildingId,data.flatId,data.ledId);
+    socket.on("led_remove", function (data) {
+        console.log("Row deleted : [ buildingId : " + data.buildingId + ", flatId : " + data.flatId + ", ledId : " + data.ledId + " ]");
+        db.prepare('DELETE FROM modelData WHERE buildingId=? AND flatId=? AND ledId=?').run(data.buildingId, data.flatId, data.ledId);
+        databaseCache = db.prepare("SELECT buildingId,flatId,ledId,isSold FROM modelData").all();
     })
 })
