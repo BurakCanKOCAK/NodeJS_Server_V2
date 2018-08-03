@@ -28,23 +28,26 @@
 #define DATA_PIN 6
 // Clock pin only needed for SPI based chipsets when not using hardware SPI
 //#define CLOCK_PIN 8
-
+String dataString="";
 CRGB leds[NUM_LEDS];
 
 void setup() {
-    Serial.begin(9600);
+    Serial.begin(115200);
 	  // sanity check delay - allows reprogramming if accidently blowing power w/leds
     FastLED.addLeds<WS2812B, DATA_PIN, GRB>(leds, NUM_LEDS);
     
 }
 
 void loop() {
+  //Serial.println("11,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12");
+  //Serial.println("15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,151,5,15,15,15,15,15,15,1,212,412,12,12,12,51,25,1221,21");
   if (Serial.available() > 0) {
     // read the incoming byte:
     int data_received = Serial.read();
-    Serial.print("I received: ");
-    Serial.println(data_rec_array,DEC);
-    Serial.println(data_received, DEC);
+    ///Serial.print("I received: ");
+    //Serial.println(data_rec_array,DEC);
+    ///Serial.println(data_received,DEC);
+    dataString+= data_received-48;
     if(data_received==49)
     {
       startup(255,0,0);
@@ -59,6 +62,10 @@ void loop() {
             }else if(data_received==54){
               startup(0,0,0);
             }
+  }
+  if(dataString.length()!=0){
+  Serial.println(dataString);
+  dataString="";
   }
  }
 
