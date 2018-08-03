@@ -9,7 +9,7 @@ var app = express();
 var server = require('http').Server(app);
 var io = require('socket.io')(server);
 //SerialPort
-var isSerialPortOpen=False;
+var isSerialPortOpen=false;
 const SerialPort = require('serialport');
 const port = new SerialPort('/dev/ttyUSB0', {
     baudRate: 115200
@@ -106,7 +106,7 @@ app.get('/api/allon', (req, res) => {
 
 // ALL OFF
 app.get('/api/alloff', (req, res) => {
-    res.sendFile(__dirname + '/static/index.html')
+
 })
 
 // SHOW ONSALE
