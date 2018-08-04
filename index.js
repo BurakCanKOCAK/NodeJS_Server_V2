@@ -217,7 +217,7 @@ app.get('/api/flat/:flatId/:status',(req,res)=>{
         });
         flatStatus(flatId,"4")
     }
-    res.status(200).send(flatId[0]+" - "+flatId[1]+" -> "+status);
+    res.status(200).send(flatId[0]+" - "+flatId[1]+" -> "+req.params.status);
    
 })
 
