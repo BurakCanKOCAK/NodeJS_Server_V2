@@ -276,7 +276,7 @@ function flatStatus(flatIdentity,flatStatus)
     databaseCache.forEach(element => {
         if(element.buildingId==flatIdentity[0] && element.flatId == flatIdentity[1])
         {
-            port.write(element.ledId+",", function (err, data) {
+            port.write(element.ledId-1+",", function (err, data) {
 
                 if (err) {
                     console.log("Error");
@@ -337,7 +337,7 @@ function showOnSale() {
     databaseCache.forEach(element => {
         if(element.isSold==1)
         {
-            port.write(element.ledId+",", function (err, data) {
+            port.write(element.ledId-1+",", function (err, data) {
 
                 if (err) {
                     console.log("Error");
