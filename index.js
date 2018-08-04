@@ -196,7 +196,7 @@ function showAllOff() {
         if (err) {
             console.log("Error");
         } else {
-            console.log("Data : "+string(data));
+            console.log("Data : "+String(data));
         }
         console.log("Arduino started successfully !");
     });
