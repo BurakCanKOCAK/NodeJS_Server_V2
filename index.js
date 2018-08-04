@@ -486,8 +486,8 @@ io.on('connection', function (socket) {
             socket.emit('add_led_success');
             console.log("Led Added Successfully");
         } catch (error) {
-            socket.emit('error_led_id_exists', db.prepare("SELECT buildingId,flatId FROM modelData Where ledId=?").get(data.ledId));
-            console.log("(!)Led Id Exists");
+            socket.emit('error_led_id_exists_or_not_int', db.prepare("SELECT buildingId,flatId FROM modelData Where ledId=?").get(data.ledId));
+            console.log("(!)Led Id Exists or value incorrect");
         }
     })
 
