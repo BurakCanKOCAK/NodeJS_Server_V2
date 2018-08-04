@@ -179,7 +179,8 @@ app.get('/api/alloff', (req, res) => {
 
 // SHOW ONSALE
 app.get('/api/show/onsale', (req, res) => {
-    res.sendFile(__dirname + '/static/index.html')
+    showOnSale();
+    res.status(200).send("onSale");    
 })
 
 // EFFECT
