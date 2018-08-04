@@ -11,17 +11,31 @@
 
 <style>
   body {
-    font-family: sans-serif;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   }
 
   table td,
   table th {
+    font-size: 120%;    
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     padding: 5px;
   }
+
+  .footer {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    padding-top: 10px;
+    background-color: #ffbb22;
+    color: black;
+    text-align: center;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
 </style>
 
 
-<div class="table-responsive" id="contacts">
+<div class="table-responsive" style="margin-top: 2em; margin-left: 10%;margin-right: 10%;" id="contacts">
   <table>
     <td class="buildingId">
       <input type="hidden" id="id-field" />
@@ -34,7 +48,7 @@
       <input class="form-control input-sm" type="text" id="ledId-field" placeholder="Led Id" />
     </td>
     <td class="add">
-      <button id="add-btn">Add</button>
+      <button type="button" class="btn btn-success" id="add-btn">Add</button>
       <button id="edit-btn">Edit</button>
     </td>
   </table>
@@ -52,22 +66,27 @@
     <tbody class="list">
       <tr id="999999">
         <td class="id" style="display: none;">999999</td>
-        <td class="buildingId">1</td>
+        <td class="buildingId">1</td></b>
         <td class="flatId">1</td>
         <td class="ledId">2</td>
         <td class="edit">
-          <button class="btn btn-warning">Edit</button>
+          <button class="btn btn-warning" style="display: none;">Edit</button>
         </td>
         <td class="remove">
           <button class="btn btn-danger">Remove</button>
         </td>
       </tr>
-    
+
     </tbody>
   </table>
 
 
-  <p>Copyright@BBH 2018</p>
+  <!-- Footer -->
+  <div class="footer">
+    <p><b>Copyright@2018</b></p>
+  <p><b>PATYO Mimarlik Ankara/TURKEY</b></p>
+  </div>
+  
 </div>
 
 <body>
@@ -83,9 +102,9 @@
     var contactList = new List('contacts', options);
 
     var idField = $('#id-field'),
-    buildingIdField = $('#buildingId-field'),
-    flatIdField = $('#flatId-field'),
-    ledIdField = $('#ledId-field'),
+      buildingIdField = $('#buildingId-field'),
+      flatIdField = $('#flatId-field'),
+      ledIdField = $('#ledId-field'),
       addBtn = $('#add-btn'),
       editBtn = $('#edit-btn').hide(),
       removeBtns = $('.btn-danger'),
@@ -96,18 +115,13 @@
 
     //Add button
     addBtn.click(function () {
-      contactList.add({
-        id: ledIdField.val(),
-        buildingId: buildingIdField.val(),
-        flatId: flatIdField.val(),
-        ledId: ledIdField.val()
+      socket.emit('led_add', {
+        buildingId: buildingIdField.val().trim(),
+        flatId: flatIdField.val().trim(),
+        ledId: ledIdField.val().trim()
       });
-      socket.emit('led_add', { buildingId : buildingIdField.val().trim(),flatId:flatIdField.val().trim(),ledId:ledIdField.val().trim() });
-      clearFields();
-      refreshCallbacks();
-      location.reload();
     });
-    
+
     //Edit button
     editBtn.click(function () {
       var item = contactList.get('id', idField.val())[0];
@@ -131,15 +145,18 @@
         var itemId = $(this).closest('tr').find('.id').text();
         var list_item;
         contactList.items.forEach(element => {
-          if(String(element._values.id)==itemId)
-          {
-            list_item=element._values;
+          if (String(element._values.id) == itemId) {
+            list_item = element._values;
             console.log(element._values.ledId);
           }
         });
         console.log(contactList.items);
         contactList.remove('id', itemId);
-        socket.emit('led_remove', { buildingId : list_item.buildingId,flatId:list_item.flatId,ledId:list_item.ledId});
+        socket.emit('led_remove', {
+          buildingId: list_item.buildingId,
+          flatId: list_item.flatId,
+          ledId: list_item.ledId
+        });
         //location.reload();
       });
 
@@ -162,14 +179,15 @@
       ledIdField.val('');
     }
 
-    function showWrongDataPopupMessage(){
+    function showWrongDataPopupMessage() {
       alert("Please enter valid values to the fields !")
     }
-    function showAlreadyOnTheListPopupMessage(){
-      alert("LedId is already in use !")
-    }
 
-</script>
+    function showAlreadyOnTheListPopupMessage(data) {
+      console.log(data);
+      alert("LedId is already in use ! \nBuildingId = "+data.buildingId+" \nFlatId = "+data.flatId);
+    }
+  </script>
 
 
   <!--AJAX + JS SCRIPT  For Socket.io!-->
@@ -184,21 +202,36 @@
       $("#text").append(data);
     });
 
+    socket.on('error_led_id_exists',function(data){
+      showAlreadyOnTheListPopupMessage(data);
+    });
+
+    socket.on('add_led_success',function(data){
+      contactList.add({
+        id: ledIdField.val(),
+        buildingId: buildingIdField.val(),
+        flatId: flatIdField.val(),
+        ledId: ledIdField.val()
+      });
+      clearFields();
+      refreshCallbacks();
+      location.reload();
+    });
+
     socket.on('dbValues', function (data) {
       console.log(data);
       var result_style = document.getElementById('999999').style;
       result_style.display = 'none';
       data.forEach(element => {
         contactList.add({
-        id: element["ledId"],
-        buildingId: element["buildingId"],
-        flatId: element["flatId"],
-        ledId: element["ledId"]
+          id: element["ledId"],
+          buildingId: element["buildingId"],
+          flatId: element["flatId"],
+          ledId: element["ledId"]
         });
       });
       clearFields();
       refreshCallbacks();
     });
-
   </script>
 </body>

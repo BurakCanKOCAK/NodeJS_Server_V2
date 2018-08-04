@@ -11,12 +11,17 @@ var io = require('socket.io')(server);
 //SerialPort
 var isSerialPortOpen=false;
 const SerialPort = require('serialport');
-const port = new SerialPort('/dev/ttyUSB0', {
-    baudRate: 115200
-}, () => {
-    console.log('SerialPort Opened');
-    isSerialPortOpen=True
-});
+try {
+    const port = new SerialPort('/dev/ttyUSB0', {
+        baudRate: 115200
+    }, () => {
+        console.log('SerialPort Opened');
+        isSerialPortOpen=true;
+    });
+    
+} catch (error) {
+    console.log('SerialPort is not Opened')
+}
 const parsers = SerialPort.parsers;
 //helmet
 app.use(helmet());
@@ -172,8 +177,11 @@ function closeDb() {
 //io Socket Connection Between Interface and NodeJS
 io.on('connection', function (socket) {
 
-    console.log("connect success");
-    socket.emit('dbValues', db.prepare("SELECT ledId,flatId, buildingId FROM modelData ORDER BY buildingId").all());
+    console.log("Connect Success");
+    socket.emit('dbValues', databaseCache);
+    //Read DB insteadOf cache
+    //socket.emit('dbValues', db.prepare("SELECT ledId,flatId, buildingId FROM modelData ORDER BY buildingId").all());
+    
     //Send data each second
     /*
     setInterval(function(){
@@ -193,10 +201,22 @@ io.on('connection', function (socket) {
         console.log(data);
     })
 
-    socket.on("led_add", function (data) {
-        console.log("Row added : [ buildingId : " + data.buildingId + ", flatId : " + data.flatId + ", ledId : " + data.ledId + " ]");
-        db.prepare('INSERT INTO modelData VALUES (?,?,?,?)').run(data.buildingId, data.flatId, data.ledId, 0);
+    socket.on("led_edit",function (data){
+        db.prepare('UPDATE modelData SET buildingId=?,flatId=? Where ledId=?').run(data.buildingId, data.flatId, data.ledId);
         databaseCache = db.prepare("SELECT buildingId,flatId,ledId,isSold FROM modelData").all();
+    })
+
+    socket.on("led_add", function (data) {
+        try {
+            console.log("Led Add Received : [ buildingId : " + data.buildingId + ", flatId : " + data.flatId + ", ledId : " + data.ledId + " ]");
+            db.prepare('INSERT INTO modelData VALUES (?,?,?,?)').run(data.buildingId, data.flatId, data.ledId, 0);
+            databaseCache = db.prepare("SELECT buildingId,flatId,ledId,isSold FROM modelData").all();
+            socket.emit('add_led_success');
+            console.log("Led Added Successfully");                
+        } catch (error) {
+            socket.emit('error_led_id_exists',db.prepare("SELECT buildingId,flatId FROM modelData Where ledId=?").get(data.ledId));
+            console.log("(!)Led Id Exists");                
+        }
     })
 
     socket.on("led_remove", function (data) {
