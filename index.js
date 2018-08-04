@@ -85,9 +85,7 @@ function initArduino(){
             if (err) {
                   console.log("Error :",err);
               return console.log('Error on write: ', err.message);
-            }else{
-                  console.log("Data :",data);
-          }});
+            }});
         //Init arduino by sending data
         console.log("Data Sent");
     }else{
