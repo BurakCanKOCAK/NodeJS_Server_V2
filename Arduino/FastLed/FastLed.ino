@@ -100,7 +100,7 @@ void loop() {
                   dataReceiveInProgress=true;
                   }else if(data_received==56){
                     initArduinoStart();
-                    dataReceiveInProgress=true;
+                    //dataReceiveInProgress=true;
                     }else if(data_received==57){
                       initArduinoFinish();
                       }
@@ -186,22 +186,24 @@ void setShowOnSaleInitials(){
   }
   
  void initArduinoStart(){
-   for(int j=0;j<60;j++){
+   for(int j=0;j<NUM_LEDS;j++){
         leds[j]=CRGB(182,95,13);
       }
       FastLED.show();
+      Serial.println("8_OK");
      //delay(3000);
   }
 
  void initArduinoFinish(){
-      for(int j=0;j<60;j++){
+      for(int j=0;j<NUM_LEDS;j++){
         leds[j]=CRGB(0,0,0);
       }
       FastLED.show();
+      Serial.println("9_OK");
   }
   
 void startup(int Red,int Green,int Blue){
-    for(int j=0;j<60;j++){
+    for(int j=0;j<NUM_LEDS;j++){
         leds[j]=CRGB(Red,Green,Blue);
       }
       FastLED.show();

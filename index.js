@@ -81,13 +81,14 @@ setTimeout(initArduino, 4000);
 function initArduino(){
     if(port.isOpen)
     {
-        port.write("8",function(err,data){
+        port.write("8,",function(err,data){
             if (err) {
                   console.log("Error :",err);
               return console.log('Error on write: ', err.message);
+            }else{
+                  console.log("Data Sent : "+data);
             }});
         //Init arduino by sending data
-        console.log("Data Sent");
     }else{
         console.log("Connection failed with Arduino...Retrying in 4seconds !");
         setTimeout(initArduino, 4000);
