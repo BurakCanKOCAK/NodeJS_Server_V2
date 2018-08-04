@@ -168,11 +168,13 @@ app.get('/add/building/:buildingId', (req, res) => {
 app.get('/api/allon', (req, res) => {
     //Send 6
     showAllOn();
+    res.status(200).send("allon");
 })
 
 // ALL OFF
 app.get('/api/alloff', (req, res) => {
     showAllOff();
+    res.status(200).send("alloff");
 })
 
 // SHOW ONSALE
@@ -183,6 +185,7 @@ app.get('/api/show/onsale', (req, res) => {
 // EFFECT
 app.get('/api/show/effect', (req, res) => {
     showEffect();
+    res.status(200).send("effect");
 })
 
 // FLAT ON-OFF-SELL-ONSALE
