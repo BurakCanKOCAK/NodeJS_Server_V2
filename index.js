@@ -12,22 +12,22 @@ var io = require('socket.io')(server);
 var isSerialPortOpen = false;
 const SerialPort = require('serialport');
 var port = new SerialPort('/dev/ttyUSB0', {
-        baudRate: 115200
-    }, () => {
-        console.log('SerialPort is opening....');
-        if (port.isOpen) {
-            isSerialPortOpen = true;
-            console.log('SerialPort is Open');
-        } else {
-            isSerialPortOpen = false;
-            console.log('SerialPort is not Open');
-        }
-    });
+    baudRate: 115200
+}, () => {
+    console.log('SerialPort is opening....');
+    if (port.isOpen) {
+        isSerialPortOpen = true;
+        console.log('SerialPort is Open');
+    } else {
+        isSerialPortOpen = false;
+        console.log('SerialPort is not Open');
+    }
+});
 const parsers = SerialPort.parsers;
 const parser = new parsers.Readline({
     delimiter: '\n'
-  
-  });
+
+});
 port.pipe(parser);
 //helmet
 app.use(helmet());
@@ -78,25 +78,26 @@ for (var i = 0; i < count['count(*)']; i++) {
 //--------------------------------------------------------//
 setTimeout(initArduino, 4000);
 
-function initArduino(){
-    if(port.isOpen)
-    {
-        port.write("8,",function(err,data){
+function initArduino() {
+    if (port.isOpen) {
+        port.write("8,", function (err, data) {
             if (err) {
-                  console.log("Error :",err);
-              return console.log('Error on write: ', err.message);
-            }else{
-                  console.log("Data Sent : "+data);
-            }});
+                console.log("Error :", err);
+                return console.log('Error on write: ', err.message);
+            } else {
+                setTimeout(showAllOff, 4000);
+                console.log("Data Sent : " + data);
+            }
+        });
         //Init arduino by sending data
-    }else{
+    } else {
         console.log("Connection failed with Arduino...Retrying in 4seconds !");
-        openArduinoPort()
+        setTimeout(openArduinoPort, 1500);
         setTimeout(initArduino, 4000);
     }
 }
 
-function openArduinoPort(){
+function openArduinoPort() {
     port = new SerialPort('/dev/ttyUSB0', {
         baudRate: 115200
     }, () => {
@@ -104,6 +105,7 @@ function openArduinoPort(){
         if (port.isOpen) {
             isSerialPortOpen = true;
             console.log('SerialPort is Open');
+            setTimeout(showAllOff, 4000);
         } else {
             isSerialPortOpen = false;
             console.log('SerialPort is not Open');
@@ -188,6 +190,32 @@ initDB();
 
 
 // Functions
+function showAllOff() {
+    port.write("9", function (err, data) {
+
+        if (err) {
+            console.log("Error");
+        } else {
+            console.log("Data : "+string(data));
+        }
+        console.log("Arduino started successfully !");
+    });
+}
+
+
+function showAllOn() {
+
+}
+
+function showEffect() {
+
+}
+
+function showOnSale() {
+
+}
+
+
 function initDB() {
     db.prepare("CREATE TABLE if not exists user (ROWID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,flatId INT, info TEXT)").run();
     db.prepare("CREATE TABLE if not exists modelData (buildingId TEXT,flatId INT,ledId INTEGER PRIMARY KEY NOT NULL, isSold INTEGER DEFAULT 0)").run();
