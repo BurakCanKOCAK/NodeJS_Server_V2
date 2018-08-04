@@ -11,7 +11,7 @@ var io = require('socket.io')(server);
 //SerialPort
 var isSerialPortOpen = false;
 const SerialPort = require('serialport');
-const port = new SerialPort('/dev/ttyUSB0', {
+var port = new SerialPort('/dev/ttyUSB0', {
         baudRate: 115200
     }, () => {
         console.log('SerialPort is opening....');
@@ -91,7 +91,8 @@ function initArduino(){
         //Init arduino by sending data
     }else{
         console.log("Connection failed with Arduino...Retrying in 4seconds !");
-        setTimeout(openArduinoPort, 4000);
+        openArduinoPort()
+        setTimeout(initArduino, 4000);
     }
 }
 
