@@ -221,7 +221,7 @@ app.get('/api/flat/:flatId/:status',(req,res)=>{
 
 // COMMMERCIAL ON-OFF-SELL-ONSALE
 app.get('/api/commercial/:commercialId/:status',(req,res)=>{
-    req.param.commercialId
+    //req.param.commercialId
 })
 
 //--------------------------------------------------------//
@@ -321,7 +321,38 @@ function showEffect() {
 }
 
 function showOnSale() {
+    port.write("5", function (err, data) {
 
+        if (err) {
+            console.log("Error");
+        } else {
+            arduinoState=1;
+            arduinoStateMessage="Arduino : SHOW ONSALE";
+            console.log("CMD : SHOW ONSALE");
+        }
+    });
+
+    databaseCache.forEach(element => {
+        if(element.isSold==1)
+        {
+            port.write(element.ledId+",", function (err, data) {
+
+                if (err) {
+                    console.log("Error");
+                } 
+            });
+        }
+    });   
+    port.write(".", function (err, data) {
+
+        if (err) {
+            console.log("Error");
+        } else {
+            arduinoState=1;
+            arduinoStateMessage="Arduino : SHOW ONSALE";
+            console.log("CMD : SHOW ONSALE");
+        }
+    });
 }
 
 
