@@ -23,7 +23,7 @@
 //
 //////////////////////////////////////////////////
 
-#define NUM_LEDS 220
+#define NUM_LEDS 230
 // Data pin that led data will be written out over
 #define DATA_PIN 6
 // Clock pin only needed for SPI based chipsets when not using hardware SPI
