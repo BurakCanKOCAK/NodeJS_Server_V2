@@ -29,9 +29,12 @@
 // Clock pin only needed for SPI based chipsets when not using hardware SPI
 //#define CLOCK_PIN 8
 String dataString="";
+int randNumber;
+
 CRGB leds[NUM_LEDS];
 
 void setup() {
+    randomSeed(analogRead(0));
     Serial.begin(115200);
 	  // sanity check delay - allows reprogramming if accidently blowing power w/leds
     FastLED.addLeds<WS2812B, DATA_PIN, GRB>(leds, NUM_LEDS);
@@ -39,10 +42,7 @@ void setup() {
 }
 
 void loop() {
-  //Serial.println("11,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12");
-  //Serial.println("15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,151,5,15,15,15,15,15,15,1,212,412,12,12,12,51,25,1221,21");
   if (Serial.available() > 0) {
-    // read the incoming byte:
     int data_received = Serial.read();
     ///Serial.print("I received: ");
     //Serial.println(data_rec_array,DEC);
@@ -61,14 +61,39 @@ void loop() {
             startup(255,255,255);
             }else if(data_received==54){
               startup(0,0,0);
-            }
+            }else if(data_received==56){
+              initArduino();
+              }
   }
   if(dataString.length()!=0){
   Serial.println(dataString);
   dataString="";
   }
  }
+void showEffect(){
+   for(int j=0;j<NUM_LEDS;j++){
+        randNumber = random(2);
+        if(randNumber==0){
+          leds[j]=CRGB(182, 95, 13);
+        }else{
+          leds[j]=CRGB(0, 0, 0);
+        }
+      }
+      FastLED.show();
+  }
 
+ void initArduino(){
+   for(int j=0;j<60;j++){
+        leds[j]=CRGB(182,95,13);
+      }
+      FastLED.show();
+     delay(3000);
+      for(int j=0;j<60;j++){
+        leds[j]=CRGB(0,0,0);
+      }
+      FastLED.show();
+  }
+  
 void startup(int Red,int Green,int Blue){
     for(int j=0;j<60;j++){
         leds[j]=CRGB(Red,Green,Blue);
