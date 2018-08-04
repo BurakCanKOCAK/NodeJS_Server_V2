@@ -408,6 +408,66 @@ io.on('connection', function (socket) {
         console.log(data);
     })
 
+    socket.on("led_test_on",function(data){
+        port.write("1", function (err, data) {
+
+            if (err) {
+                console.log("Error");
+            } else {
+                arduinoState=1;
+                arduinoStateMessage="Arduino : FLAT STATUS CHANGE";
+                console.log("CMD : FLAT STATUS UPDATE");
+            }
+        });
+        port.write(data, function (err, data) {
+
+            if (err) {
+                console.log("Error");
+            }
+        });
+        port.write(",.", function (err, data) {
+
+            if (err) {
+                console.log("Error");
+            } else {
+                arduinoState=1;
+                arduinoStateMessage="Arduino : FLAT STATUS CHANGE";
+                console.log("CMD : FLAT STATUS UPDATE");
+            }
+        });
+
+        
+    })
+
+    socket.on("led_test_off",function(data){
+        port.write("2", function (err, data) {
+
+            if (err) {
+                console.log("Error");
+            } else {
+                arduinoState=1;
+                arduinoStateMessage="Arduino : FLAT STATUS CHANGE";
+                console.log("CMD : FLAT STATUS UPDATE");
+            }
+        });
+        port.write(data, function (err, data) {
+
+            if (err) {
+                console.log("Error");
+            }
+        });
+        port.write(",.", function (err, data) {
+
+            if (err) {
+                console.log("Error");
+            } else {
+                arduinoState=1;
+                arduinoStateMessage="Arduino : FLAT STATUS CHANGE";
+                console.log("CMD : FLAT STATUS UPDATE");
+            }
+        });
+    })
+
     socket.on("error_msg", function (data) {
         //Emits error messages to the frontend
         console.log(data);
