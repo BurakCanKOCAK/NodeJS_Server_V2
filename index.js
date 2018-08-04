@@ -9,20 +9,26 @@ var app = express();
 var server = require('http').Server(app);
 var io = require('socket.io')(server);
 //SerialPort
-var isSerialPortOpen=false;
+var isSerialPortOpen = false;
 const SerialPort = require('serialport');
-try {
-    const port = new SerialPort('/dev/ttyUSB0', {
+const port = new SerialPort('/dev/ttyUSB0', {
         baudRate: 115200
     }, () => {
-        console.log('SerialPort Opened');
-        isSerialPortOpen=true;
+        console.log('SerialPort is opening....');
+        if (port.isOpen) {
+            isSerialPortOpen = true;
+            console.log('SerialPort is Open');
+        } else {
+            isSerialPortOpen = false;
+            console.log('SerialPort is not Open');
+        }
     });
-    
-} catch (error) {
-    console.log('SerialPort is not Opened')
-}
 const parsers = SerialPort.parsers;
+const parser = new parsers.Readline({
+    delimiter: '\n'
+  
+  });
+port.pipe(parser);
 //helmet
 app.use(helmet());
 app.use(bodyParser.urlencoded({
@@ -70,6 +76,18 @@ for (var i = 0; i < count['count(*)']; i++) {
 */
 
 //--------------------------------------------------------//
+setTimeout(initArduino, 4000);
+
+function initArduino(){
+    if(port.isOpen)
+    {
+        console.log("Data Sent");
+    }else{
+        console.log("Connection failed with Arduino...Retrying in 4seconds !");
+        setTimeout(initArduino, 4000);
+    }
+}
+//-------------------------------------------------------//
 app.get('/home/:version', (req, res) => {
     res.send('HOME! ' + req.params.version);
 })
@@ -181,7 +199,7 @@ io.on('connection', function (socket) {
     socket.emit('dbValues', databaseCache);
     //Read DB insteadOf cache
     //socket.emit('dbValues', db.prepare("SELECT ledId,flatId, buildingId FROM modelData ORDER BY buildingId").all());
-    
+
     //Send data each second
     /*
     setInterval(function(){
@@ -201,7 +219,7 @@ io.on('connection', function (socket) {
         console.log(data);
     })
 
-    socket.on("led_edit",function (data){
+    socket.on("led_edit", function (data) {
         db.prepare('UPDATE modelData SET buildingId=?,flatId=? Where ledId=?').run(data.buildingId, data.flatId, data.ledId);
         databaseCache = db.prepare("SELECT buildingId,flatId,ledId,isSold FROM modelData").all();
     })
@@ -212,10 +230,10 @@ io.on('connection', function (socket) {
             db.prepare('INSERT INTO modelData VALUES (?,?,?,?)').run(data.buildingId, data.flatId, data.ledId, 0);
             databaseCache = db.prepare("SELECT buildingId,flatId,ledId,isSold FROM modelData").all();
             socket.emit('add_led_success');
-            console.log("Led Added Successfully");                
+            console.log("Led Added Successfully");
         } catch (error) {
-            socket.emit('error_led_id_exists',db.prepare("SELECT buildingId,flatId FROM modelData Where ledId=?").get(data.ledId));
-            console.log("(!)Led Id Exists");                
+            socket.emit('error_led_id_exists', db.prepare("SELECT buildingId,flatId FROM modelData Where ledId=?").get(data.ledId));
+            console.log("(!)Led Id Exists");
         }
     })
 
