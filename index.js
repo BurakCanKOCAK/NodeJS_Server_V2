@@ -191,13 +191,13 @@ app.get('/api/show/effect', (req, res) => {
 // FLAT ON-OFF-SELL-ONSALE
 app.get('/api/flat/:flatId/:status',(req,res)=>{
     if(req.params.status=="on"){
-        flatStatus(req.params.flatId,1)
+        flatStatus(req.params.flatId,"1")
     }else if(req.params.status=="off"){
-        flatStatus(req.params.flatId,2)
+        flatStatus(req.params.flatId,"2")
     }else if(req.params.status=="sell"){
-        flatStatus(req.params.flatId,3)
+        flatStatus(req.params.flatId,"3")
     }else if(req.params.status=="onsale"){
-        flatStatus(req.params.flatId,4)
+        flatStatus(req.params.flatId,"4")
     }
    
 })
