@@ -91,8 +91,23 @@ function initArduino(){
         //Init arduino by sending data
     }else{
         console.log("Connection failed with Arduino...Retrying in 4seconds !");
-        setTimeout(initArduino, 4000);
+        setTimeout(openArduinoPort, 4000);
     }
+}
+
+function openArduinoPort(){
+    port = new SerialPort('/dev/ttyUSB0', {
+        baudRate: 115200
+    }, () => {
+        console.log('SerialPort is opening....');
+        if (port.isOpen) {
+            isSerialPortOpen = true;
+            console.log('SerialPort is Open');
+        } else {
+            isSerialPortOpen = false;
+            console.log('SerialPort is not Open');
+        }
+    });
 }
 
 parser.on("data", console.log);
