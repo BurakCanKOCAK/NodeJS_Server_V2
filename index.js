@@ -197,7 +197,7 @@ app.get('/api/flat/:flatId/:status',(req,res)=>{
     }else if(req.params.status=="off"){
         flatStatus(flatId,"2")
     }else if(req.params.status=="sell"){
-        databaseCache.array.forEach(element => {
+        databaseCache.forEach(element => {
             if(element.buildingId==flatId[0] && element.flatId== flatId[1])
             {
                 db.prepare('UPDATE modelData SET isSold=1 Where ledId=?').run(element.ledId);
@@ -207,7 +207,7 @@ app.get('/api/flat/:flatId/:status',(req,res)=>{
 
         flatStatus(flatId,"3")
     }else if(req.params.status=="onsale"){
-        databaseCache.array.forEach(element => {
+        databaseCache.forEach(element => {
             if(element.buildingId==flatId[0] && element.flatId== flatId[1])
             {
                 db.prepare('UPDATE modelData SET isSold=0 Where ledId=?').run(element.ledId);
