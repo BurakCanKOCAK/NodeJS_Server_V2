@@ -10,6 +10,9 @@ var server = require('http').Server(app);
 var io = require('socket.io')(server);
 //SerialPort
 var isSerialPortOpen = false;
+//0 : Not Connected | 1 : Connected | 2 : Error | 
+var arduinoState=0;
+var arduinoStateMessage="";
 const SerialPort = require('serialport');
 var port = new SerialPort('/dev/ttyUSB0', {
     baudRate: 115200
@@ -17,9 +20,12 @@ var port = new SerialPort('/dev/ttyUSB0', {
     console.log('SerialPort is opening....');
     if (port.isOpen) {
         isSerialPortOpen = true;
+        arduinoState=1;
+        arduinoStateMessage="Arduino is connected";
         console.log('SerialPort is Open');
     } else {
         isSerialPortOpen = false;
+        arduinoStateMessage="Arduino is not connected";
         console.log('SerialPort is not Open');
     }
 });
@@ -48,6 +54,7 @@ var flatIdList = [];
 var databaseCache;
 var saleList = [];
 var flatList = [];
+
 //Checks if variable exists or not
 function isset(accessor) {
     try {
@@ -83,8 +90,12 @@ function initArduino() {
         port.write("8,", function (err, data) {
             if (err) {
                 console.log("Error :", err);
+                arduinoState=2;
+                arduinoStateMessage="Error while initializing arduino !";
                 return console.log('Error on write: ', err.message);
             } else {
+                arduinoState=1;
+                arduinoStateMessage="Arduino initialized...[8]";
                 setTimeout(showAllOff, 4000);
                 console.log("Data Sent : " + data);
             }
@@ -104,16 +115,20 @@ function openArduinoPort() {
         console.log('SerialPort is opening....');
         if (port.isOpen) {
             isSerialPortOpen = true;
+            arduinoState=1;
+            arduinoStateMessage="Arduino is connected";
             console.log('SerialPort is Open');
             setTimeout(showAllOff, 4000);
         } else {
             isSerialPortOpen = false;
+            arduinoState=0;
+            arduinoStateMessage="Arduino is not connected";
             console.log('SerialPort is not Open');
         }
     });
 }
 
-parser.on("data", console.log);
+parser.on("data", arduinoMessageHandler);
 //-------------------------------------------------------//
 app.get('/home/:version', (req, res) => {
     res.send('HOME! ' + req.params.version);
@@ -190,25 +205,48 @@ initDB();
 
 
 // Functions
+function arduinoMessageHandler(data){
+    console.log("Data Received : "+ data);
+}
+
 function showAllOff() {
-    port.write("9", function (err, data) {
+    port.write("7,.", function (err, data) {
 
         if (err) {
             console.log("Error");
         } else {
+            arduinoState=1;
+            arduinoStateMessage="Arduino : ALL OFF";
             console.log("Data : "+String(data));
         }
-        console.log("Arduino started successfully !");
     });
 }
 
 
 function showAllOn() {
+    port.write("6,.", function (err, data) {
 
+        if (err) {
+            console.log("Error");
+        } else {
+            arduinoState=1;
+            arduinoStateMessage="Arduino : ALL ON";
+            console.log("Data : "+String(data));
+        }
+    });
 }
 
 function showEffect() {
+    port.write("0,.", function (err, data) {
 
+        if (err) {
+            console.log("Error");
+        } else {
+            arduinoState=1;
+            arduinoStateMessage="Arduino : ALL ON";
+            console.log("Data : "+String(data));
+        }
+    });
 }
 
 function showOnSale() {
