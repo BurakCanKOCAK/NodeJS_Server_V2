@@ -167,11 +167,12 @@ app.get('/add/building/:buildingId', (req, res) => {
 // ALL ON
 app.get('/api/allon', (req, res) => {
     //Send 6
+    showAllOn();
 })
 
 // ALL OFF
 app.get('/api/alloff', (req, res) => {
-
+    showAllOff();
 })
 
 // SHOW ONSALE
@@ -181,7 +182,7 @@ app.get('/api/show/onsale', (req, res) => {
 
 // EFFECT
 app.get('/api/show/effect', (req, res) => {
-    res.sendFile(__dirname + '/static/index.html')
+    showEffect();
 })
 
 // FLAT ON-OFF-SELL-ONSALE
@@ -217,7 +218,7 @@ function showAllOff() {
         } else {
             arduinoState=1;
             arduinoStateMessage="Arduino : ALL OFF";
-            console.log("Data : "+String(data));
+            console.log("CMD : ALL OFF");
         }
     });
 }
@@ -231,7 +232,7 @@ function showAllOn() {
         } else {
             arduinoState=1;
             arduinoStateMessage="Arduino : ALL ON";
-            console.log("Data : "+String(data));
+            console.log("CMD : ALL ON");
         }
     });
 }
@@ -243,8 +244,8 @@ function showEffect() {
             console.log("Error");
         } else {
             arduinoState=1;
-            arduinoStateMessage="Arduino : ALL ON";
-            console.log("Data : "+String(data));
+            arduinoStateMessage="Arduino : EFFECT";
+            console.log("CMD : EFFECT");
         }
     });
 }
