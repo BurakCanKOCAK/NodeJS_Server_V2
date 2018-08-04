@@ -190,14 +190,31 @@ app.get('/api/show/effect', (req, res) => {
 
 // FLAT ON-OFF-SELL-ONSALE
 app.get('/api/flat/:flatId/:status',(req,res)=>{
+    var flatId = req.params.flatId.split("_");
+
     if(req.params.status=="on"){
-        flatStatus(req.params.flatId,"1")
+        flatStatus(flatId,"1")
     }else if(req.params.status=="off"){
-        flatStatus(req.params.flatId,"2")
+        flatStatus(flatId,"2")
     }else if(req.params.status=="sell"){
-        flatStatus(req.params.flatId,"3")
+        databaseCache.array.forEach(element => {
+            if(element.buildingId==flatId[0] && element.flatId== flatId[1])
+            {
+                db.prepare('UPDATE modelData SET isSold=1 Where ledId=?').run(element.ledId);
+                databaseCache = db.prepare("SELECT buildingId,flatId,ledId,isSold FROM modelData").all();        
+            }
+        });
+
+        flatStatus(flatId,"3")
     }else if(req.params.status=="onsale"){
-        flatStatus(req.params.flatId,"4")
+        databaseCache.array.forEach(element => {
+            if(element.buildingId==flatId[0] && element.flatId== flatId[1])
+            {
+                db.prepare('UPDATE modelData SET isSold=0 Where ledId=?').run(element.ledId);
+                databaseCache = db.prepare("SELECT buildingId,flatId,ledId,isSold FROM modelData").all();        
+            }
+        });
+        flatStatus(flatId,"4")
     }
    
 })
@@ -253,9 +270,9 @@ function flatStatus(flatIdentity,flatStatus)
         }
     });
 
-    var res = flatIdentity.split("_");
+   
     databaseCache.forEach(element => {
-        if(element.buildingId==res[0] && element.flatId == res[1])
+        if(element.buildingId==flatIdentity[0] && element.flatId == flatIdentity[1])
         {
             port.write(element.ledId+",", function (err, data) {
 
