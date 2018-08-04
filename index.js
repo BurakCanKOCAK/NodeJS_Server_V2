@@ -189,8 +189,22 @@ app.get('/api/show/effect', (req, res) => {
 })
 
 // FLAT ON-OFF-SELL-ONSALE
-app.get('/list', (req, res) => {
-    res.sendFile(__dirname + '/static/index.html')
+app.get('/api/flat/:flatId/:status',(req,res)=>{
+    if(status==on){
+        flatStatus(req.param.flatId,1)
+    }else if(status==off){
+        flatStatus(req.param.flatId,2)
+    }else if(status==sell){
+        flatStatus(req.param.flatId,3)
+    }else if(statis==onsale){
+        flatStatus(req.param.flatId,4)
+    }
+   
+})
+
+// COMMMERCIAL ON-OFF-SELL-ONSALE
+app.get('/api/commercial/:commercialId/:status',(req,res)=>{
+    req.param.commercialId
 })
 
 //--------------------------------------------------------//
@@ -226,6 +240,42 @@ function showAllOff() {
     });
 }
 
+function flatStatus(flatIdentity,flatStatus)
+{
+    port.write(flatStatus, function (err, data) {
+
+        if (err) {
+            console.log("Error");
+        } else {
+            arduinoState=1;
+            arduinoStateMessage="Arduino : FLAT STATUS CHANGE";
+            console.log("CMD : FLAT STATUS UPDATE");
+        }
+    });
+
+    var res = flatIdentity.split("_");
+    databaseCache.forEach(element => {
+        if(element.buildingId==res[0] && element.flatId == res[1])
+        {
+            port.write(element.ledId+",", function (err, data) {
+
+                if (err) {
+                    console.log("Error");
+                } 
+            });
+        }
+    });   
+    port.write(".", function (err, data) {
+
+        if (err) {
+            console.log("Error");
+        } else {
+            arduinoState=1;
+            arduinoStateMessage="Arduino : FLAT STATUS CHANGE";
+            console.log("CMD : FLAT STATUS UPDATE");
+        }
+    });
+}
 
 function showAllOn() {
     port.write("6,.", function (err, data) {
