@@ -150,7 +150,7 @@ app.get('/db', function (req, res) {
 
 app.get('/configure', (req, res) => {
     res.sendFile(__dirname + '/static/configure.html')
-    list = db.prepare("SELECT ledId,flatId,isSold buildingId FROM modelData").all();
+    list = db.prepare("SELECT buildingId,flatId,ledId,isSold  FROM modelData").all();
     console.log(list);
 })
 
