@@ -505,12 +505,16 @@ io.on('connection', function (socket) {
                 console.log("CMD : FLAT STATUS UPDATE");
             }
         });
-        port.write(data, function (err, data) {
+        try {
+            port.write(data-1, function (err, data) {
 
-            if (err) {
-                console.log("Error");
-            }
-        });
+                if (err) {
+                    console.log("Error");
+                }
+            });                
+        } catch (error) {
+            //do nothing
+        }
         port.write(",.", function (err, data) {
 
             if (err) {
