@@ -106,7 +106,7 @@ void loop() {
                       }
   }else if(dataReceiveInProgress!=false && data_received==46){
     //Data reception is finished.Nokta gelme durumu
-    Serial.println("CMD_FINISH");
+    Serial.println("OK");
     dataReceiveInProgress=false ;  
     FastLED.show();
     }else if(dataReceiveInProgress!=false && data_received!=46 && data_received!=44 ){
@@ -123,19 +123,19 @@ void loop() {
         //Serial.println("DATA ARRIVED");
         if(mode==1){
           //On
-          Serial.println("FLAT ON");
+          //Serial.println("FLAT ON");
           leds[receivedLedId]=CRGB(182,95,13);
         }else if(mode==2){
           //Off
-          Serial.println("FLAT OFF");
+          //Serial.println("FLAT OFF");
           leds[receivedLedId]=CRGB(0,0,0);
           }else if(mode==3){
             //Sell
-            Serial.println("FLAT SOLD");
+            //Serial.println("FLAT SOLD");
             leds[receivedLedId]=CRGB(255,1,1);
             }else if(mode==4){
               //OnSale
-              Serial.println("FLAT ONSALE");
+              //Serial.println("FLAT ONSALE");
               leds[receivedLedId]=CRGB(10,255,10);
               }else if(mode==5){
                 //Show OnSale
@@ -192,7 +192,7 @@ void setShowOnSaleInitials(){
         leds[j]=CRGB(182,95,13);
       }
       FastLED.show();
-      Serial.println("8_OK");
+      Serial.println("ARDUINO_INIT_STARTED");
      //delay(3000);
   }
 
