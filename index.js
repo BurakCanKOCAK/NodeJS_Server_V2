@@ -310,7 +310,6 @@ function flatStatus(flatIdentity,flatStatus)
 }
 
 function buildingStatus(flatIdentity,flatStatus){
-    {
         port.write(flatStatus, function (err, data) {
     
             if (err) {
