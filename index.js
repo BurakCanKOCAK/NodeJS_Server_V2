@@ -224,7 +224,14 @@ app.get('/api/flat/:flatId/:status',(req,res)=>{
 // BUILDING ON-OFF
 app.get('/api/building/flat/:flatId/:status',(req,res)=>{
     //F, C, 1+1, 3+1, Entrance1, Entrance2
+    var flatId = req.params.flatId.split("_");
 
+    if(req.params.status=="on"){
+        buildingStatus(flatId,"1")
+    }else if(req.params.status=="off"){
+        buildingStatus(flatId,"2")
+    }
+    res.status(200).send(flatId[0]+" -> "+req.params.status);
 })
 
 // COMMMERCIAL ON-OFF-SELL-ONSALE
