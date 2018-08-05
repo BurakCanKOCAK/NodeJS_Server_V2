@@ -11,8 +11,8 @@ var io = require('socket.io')(server);
 //SerialPort
 var isSerialPortOpen = false;
 //0 : Not Connected | 1 : Connected | 2 : Error | 
-var arduinoState=0;
-var arduinoStateMessage="";
+var arduinoState = 0;
+var arduinoStateMessage = "";
 const SerialPort = require('serialport');
 var port = new SerialPort('/dev/ttyUSB0', {
     baudRate: 115200
@@ -20,12 +20,12 @@ var port = new SerialPort('/dev/ttyUSB0', {
     console.log('SerialPort is opening....');
     if (port.isOpen) {
         isSerialPortOpen = true;
-        arduinoState=1;
-        arduinoStateMessage="Arduino is connected";
+        arduinoState = 1;
+        arduinoStateMessage = "Arduino is connected";
         console.log('SerialPort is Open');
     } else {
         isSerialPortOpen = false;
-        arduinoStateMessage="Arduino is not connected";
+        arduinoStateMessage = "Arduino is not connected";
         console.log('SerialPort is not Open');
     }
 });
@@ -90,12 +90,12 @@ function initArduino() {
         port.write("8,", function (err, data) {
             if (err) {
                 console.log("Error :", err);
-                arduinoState=2;
-                arduinoStateMessage="Error while initializing arduino !";
+                arduinoState = 2;
+                arduinoStateMessage = "Error while initializing arduino !";
                 return console.log('Error on write: ', err.message);
             } else {
-                arduinoState=1;
-                arduinoStateMessage="Arduino initialized...[8]";
+                arduinoState = 1;
+                arduinoStateMessage = "Arduino initialized...[8]";
                 setTimeout(showAllOff, 4000);
                 console.log("Data Sent : " + data);
             }
@@ -115,14 +115,14 @@ function openArduinoPort() {
         console.log('SerialPort is opening....');
         if (port.isOpen) {
             isSerialPortOpen = true;
-            arduinoState=1;
-            arduinoStateMessage="Arduino is connected";
+            arduinoState = 1;
+            arduinoStateMessage = "Arduino is connected";
             console.log('SerialPort is Open');
             setTimeout(showAllOff, 4000);
         } else {
             isSerialPortOpen = false;
-            arduinoState=0;
-            arduinoStateMessage="Arduino is not connected";
+            arduinoState = 0;
+            arduinoStateMessage = "Arduino is not connected";
             console.log('SerialPort is not Open');
         }
     });
@@ -180,7 +180,7 @@ app.get('/api/alloff', (req, res) => {
 // SHOW ONSALE
 app.get('/api/show/onsale', (req, res) => {
     showOnSale();
-    res.status(200).send("onSale");    
+    res.status(200).send("onSale");
 })
 
 // EFFECT
@@ -190,52 +190,50 @@ app.get('/api/show/effect', (req, res) => {
 })
 
 // FLAT ON-OFF-SELL-ONSALE
-app.get('/api/flat/:flatId/:status',(req,res)=>{
+app.get('/api/flat/:flatId/:status', (req, res) => {
     var flatId = req.params.flatId.split("_");
 
-    if(req.params.status=="on"){
-        flatStatus(flatId,"1")
-    }else if(req.params.status=="off"){
-        flatStatus(flatId,"2")
-    }else if(req.params.status=="sell"){
+    if (req.params.status == "on") {
+        flatStatus(flatId, "1")
+    } else if (req.params.status == "off") {
+        flatStatus(flatId, "2")
+    } else if (req.params.status == "sell") {
         databaseCache.forEach(element => {
-            if(element.buildingId.includes(flatId[0]) && element.flatId== flatId[1])
-            {
+            if (element.buildingId.includes(flatId[0]) && element.flatId == flatId[1]) {
                 db.prepare('UPDATE modelData SET isSold=1 Where ledId=?').run(element.ledId);
-                databaseCache = db.prepare("SELECT buildingId,flatId,ledId,isSold FROM modelData").all();        
+                databaseCache = db.prepare("SELECT buildingId,flatId,ledId,isSold FROM modelData").all();
             }
         });
 
-        flatStatus(flatId,"3")
-    }else if(req.params.status=="onsale"){
+        flatStatus(flatId, "3")
+    } else if (req.params.status == "onsale") {
         databaseCache.forEach(element => {
-            if(element.buildingId.includes(flatId[0]) && element.flatId== flatId[1])
-            {
+            if (element.buildingId.includes(flatId[0]) && element.flatId == flatId[1]) {
                 db.prepare('UPDATE modelData SET isSold=0 Where ledId=?').run(element.ledId);
-                databaseCache = db.prepare("SELECT buildingId,flatId,ledId,isSold FROM modelData").all();        
+                databaseCache = db.prepare("SELECT buildingId,flatId,ledId,isSold FROM modelData").all();
             }
         });
-        flatStatus(flatId,"4")
+        flatStatus(flatId, "4")
     }
-    res.status(200).send(flatId[0]+" - "+flatId[1]+" -> "+req.params.status);
-   
+    res.status(200).send(flatId[0] + " - " + flatId[1] + " -> " + req.params.status);
+
 })
 
 // BUILDING ON-OFF
-app.get('/api/building/flat/:flatId/:status',(req,res)=>{
+app.get('/api/building/flat/:flatId/:status', (req, res) => {
     //F, C, 1+1, 3+1, Entrance1, Entrance2
     var flatId = req.params.flatId.split("_");
 
-    if(req.params.status=="on"){
-        buildingStatus(flatId,"1")
-    }else if(req.params.status=="off"){
-        buildingStatus(flatId,"2")
+    if (req.params.status == "on") {
+        buildingStatus(flatId, "1")
+    } else if (req.params.status == "off") {
+        buildingStatus(flatId, "2")
     }
-    res.status(200).send(flatId[0]+" -> "+req.params.status);
+    res.status(200).send(flatId[0] + " -> " + req.params.status);
 })
 
 // COMMMERCIAL ON-OFF-SELL-ONSALE
-app.get('/api/commercial/:commercialId/:status',(req,res)=>{
+app.get('/api/commercial/:commercialId/:status', (req, res) => {
     //req.param.commercialId
 })
 
@@ -255,8 +253,8 @@ initDB();
 
 
 // Functions
-function arduinoMessageHandler(data){
-    console.log("Data Received : "+ data);
+function arduinoMessageHandler(data) {
+    console.log("Data Received : " + data);
 }
 
 function showAllOff() {
@@ -265,95 +263,92 @@ function showAllOff() {
         if (err) {
             console.log("Error");
         } else {
-            arduinoState=1;
-            arduinoStateMessage="Arduino : ALL OFF";
+            arduinoState = 1;
+            arduinoStateMessage = "Arduino : ALL OFF";
             console.log("CMD : ALL OFF");
         }
     });
 }
 
-function flatStatus(flatIdentity,flatStatus)
-{
+function flatStatus(flatIdentity, flatStatus) {
     port.write(flatStatus, function (err, data) {
 
         if (err) {
             console.log("Error");
         } else {
-            arduinoState=1;
-            arduinoStateMessage="Arduino : FLAT STATUS CHANGE";
+            arduinoState = 1;
+            arduinoStateMessage = "Arduino : FLAT STATUS CHANGE";
         }
     });
 
-   
+
     databaseCache.forEach(element => {
-        if(element.buildingId.includes(flatIdentity[0]) && element.flatId == flatIdentity[1])
-        {
-            port.write(element.ledId-1+",", function (err, data) {
+        if (element.buildingId.includes(flatIdentity[0]) && element.flatId == flatIdentity[1]) {
+            port.write(element.ledId - 1 + ",", function (err, data) {
 
                 if (err) {
                     console.log("Error");
-                } 
+                }
             });
         }
-    });   
+    });
 
     port.write(".", function (err, data) {
 
         if (err) {
             console.log("Error");
         } else {
-            arduinoState=1;
-            arduinoStateMessage="Arduino : FLAT STATUS CHANGE";
+            arduinoState = 1;
+            arduinoStateMessage = "Arduino : FLAT STATUS CHANGE";
             console.log("CMD : FLAT STATUS UPDATE");
         }
     });
 }
 
-function buildingStatus(flatIdentity,flatStatus){
-        port.write(flatStatus, function (err, data) {
-    
-            if (err) {
-                console.log("Error");
-            } else {
-                arduinoState=1;
-                arduinoStateMessage="Arduino : GROUP STATUS CHANGE";
-            }
-        });
-    
-       
-        databaseCache.forEach(element => {
-            //console.log(element.buildingId + " - " +flatIdentity[0]);
-            if(element.buildingId.includes(flatIdentity[0]))
-            {
-                console.log(element.ledId-1);
-                port.write(element.ledId-1+",", function (err, data) {
-    
-                    if (err) {
-                        console.log("Error");
-                    } 
-                });
-            }
-        });   
-        
-        port.write(".", function (err, data) {
-    
-            if (err) {
-                console.log("Error");
-            } else {
-                arduinoState=1;
-                arduinoStateMessage="Arduino : GROUP STATUS CHANGE";
-                console.log("CMD : GROUP STATUS UPDATE");
-            }
-        });
+function buildingStatus(flatIdentity, flatStatus) {
+    port.write(flatStatus, function (err, data) {
+
+        if (err) {
+            console.log("Error");
+        } else {
+            arduinoState = 1;
+            arduinoStateMessage = "Arduino : GROUP STATUS CHANGE";
+        }
+    });
+
+
+    databaseCache.forEach(element => {
+        //console.log(element.buildingId + " - " +flatIdentity[0]);
+        if (element.buildingId.includes(flatIdentity[0])) {
+            //console.log(element.ledId-1);
+            port.write(element.ledId - 1 + ",", function (err, data) {
+                if (err) {
+                    console.log("Error");
+                }
+            });
+        }
+    });
+
+    port.write(".", function (err, data) {
+
+        if (err) {
+            console.log("Error");
+        } else {
+            arduinoState = 1;
+            arduinoStateMessage = "Arduino : GROUP STATUS CHANGE";
+            console.log("CMD : GROUP STATUS UPDATE");
+        }
+    });
 }
+
 function showAllOn() {
     port.write("6,.", function (err, data) {
 
         if (err) {
             console.log("Error");
         } else {
-            arduinoState=1;
-            arduinoStateMessage="Arduino : ALL ON";
+            arduinoState = 1;
+            arduinoStateMessage = "Arduino : ALL ON";
             console.log("CMD : ALL ON");
         }
     });
@@ -365,8 +360,8 @@ function showEffect() {
         if (err) {
             console.log("Error");
         } else {
-            arduinoState=1;
-            arduinoStateMessage="Arduino : EFFECT";
+            arduinoState = 1;
+            arduinoStateMessage = "Arduino : EFFECT";
             console.log("CMD : EFFECT");
         }
     });
@@ -378,30 +373,28 @@ function showOnSale() {
         if (err) {
             console.log("Error");
         } else {
-            arduinoState=1;
-            arduinoStateMessage="Arduino : SHOW ONSALE";
-            console.log("CMD : SHOW ONSALE");
+            arduinoState = 1;
+            arduinoStateMessage = "Arduino : SHOW ONSALE";
         }
     });
 
     databaseCache.forEach(element => {
-        if(element.isSold==1)
-        {
-            port.write(element.ledId-1+",", function (err, data) {
+        if (element.isSold == 1) {
+            port.write(element.ledId - 1 + ",", function (err, data) {
 
                 if (err) {
                     console.log("Error");
-                } 
+                }
             });
         }
-    });   
+    });
     port.write(".", function (err, data) {
 
         if (err) {
             console.log("Error");
         } else {
-            arduinoState=1;
-            arduinoStateMessage="Arduino : SHOW ONSALE";
+            arduinoState = 1;
+            arduinoStateMessage = "Arduino : SHOW ONSALE";
             console.log("CMD : SHOW ONSALE");
         }
     });
@@ -459,24 +452,24 @@ io.on('connection', function (socket) {
         console.log(data);
     })
 
-    socket.on("led_test_on",function(data){
+    socket.on("led_test_on", function (data) {
         port.write("1", function (err, data) {
 
             if (err) {
                 console.log("Error");
             } else {
-                arduinoState=1;
-                arduinoStateMessage="Arduino : FLAT STATUS CHANGE";
+                arduinoState = 1;
+                arduinoStateMessage = "Arduino : FLAT STATUS CHANGE";
                 console.log("CMD : FLAT STATUS UPDATE");
             }
         });
         try {
-            port.write(String(parseInt(data-1)), function (err, data) {
+            port.write(String(parseInt(data - 1)), function (err, data) {
 
                 if (err) {
                     console.log("Error");
                 }
-            });                
+            });
         } catch (error) {
             //do nothing
         }
@@ -485,33 +478,33 @@ io.on('connection', function (socket) {
             if (err) {
                 console.log("Error");
             } else {
-                arduinoState=1;
-                arduinoStateMessage="Arduino : FLAT STATUS CHANGE";
+                arduinoState = 1;
+                arduinoStateMessage = "Arduino : FLAT STATUS CHANGE";
                 console.log("CMD : FLAT STATUS UPDATE");
             }
         });
 
-        
+
     })
 
-    socket.on("led_test_off",function(data){
+    socket.on("led_test_off", function (data) {
         port.write("2", function (err, data) {
 
             if (err) {
                 console.log("Error");
             } else {
-                arduinoState=1;
-                arduinoStateMessage="Arduino : FLAT STATUS CHANGE";
+                arduinoState = 1;
+                arduinoStateMessage = "Arduino : FLAT STATUS CHANGE";
                 console.log("CMD : FLAT STATUS UPDATE");
             }
         });
         try {
-            port.write(String(parseInt(data-1)), function (err, data) {
+            port.write(String(parseInt(data - 1)), function (err, data) {
 
                 if (err) {
                     console.log("Error");
                 }
-            });                
+            });
         } catch (error) {
             //do nothing
         }
@@ -520,8 +513,8 @@ io.on('connection', function (socket) {
             if (err) {
                 console.log("Error");
             } else {
-                arduinoState=1;
-                arduinoStateMessage="Arduino : FLAT STATUS CHANGE";
+                arduinoState = 1;
+                arduinoStateMessage = "Arduino : FLAT STATUS CHANGE";
                 console.log("CMD : FLAT STATUS UPDATE");
             }
         });
