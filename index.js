@@ -322,6 +322,7 @@ function buildingStatus(flatIdentity,flatStatus){
     
        
         databaseCache.forEach(element => {
+            console.log(element.buildingId + " - " +flatIdentity[0]);
             if(element.buildingId.includes(flatIdentity[0]))
             {
                 console.log(element.ledId-1);
