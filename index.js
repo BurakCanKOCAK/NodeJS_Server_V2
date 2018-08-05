@@ -471,7 +471,7 @@ io.on('connection', function (socket) {
             }
         });
         try {
-            port.write(data-1, function (err, data) {
+            port.write(String(parseInt(data-1)), function (err, data) {
 
                 if (err) {
                     console.log("Error");
@@ -506,7 +506,7 @@ io.on('connection', function (socket) {
             }
         });
         try {
-            port.write(data-1, function (err, data) {
+            port.write(String(parseInt(data-1)), function (err, data) {
 
                 if (err) {
                     console.log("Error");
