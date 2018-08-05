@@ -221,6 +221,12 @@ app.get('/api/flat/:flatId/:status',(req,res)=>{
    
 })
 
+// BUILDING ON-OFF
+app.get('/api/building/flat/:flatId/:status',(req,res)=>{
+    //F, C, 1+1, 3+1, Entrance1, Entrance2
+
+})
+
 // COMMMERCIAL ON-OFF-SELL-ONSALE
 app.get('/api/commercial/:commercialId/:status',(req,res)=>{
     //req.param.commercialId
@@ -274,7 +280,7 @@ function flatStatus(flatIdentity,flatStatus)
 
    
     databaseCache.forEach(element => {
-        if(element.buildingId==flatIdentity[0] && element.flatId == flatIdentity[1])
+        if(element.buildingId.includes(flatIdentity[0]) && element.flatId == flatIdentity[1])
         {
             port.write(element.ledId-1+",", function (err, data) {
 
@@ -296,6 +302,42 @@ function flatStatus(flatIdentity,flatStatus)
     });
 }
 
+function buildingStatus(flatIdentity,flatStatus){
+    {
+        port.write(flatStatus, function (err, data) {
+    
+            if (err) {
+                console.log("Error");
+            } else {
+                arduinoState=1;
+                arduinoStateMessage="Arduino : GROUP STATUS CHANGE";
+                console.log("CMD : GROUP STATUS UPDATE");
+            }
+        });
+    
+       
+        databaseCache.forEach(element => {
+            if(element.buildingId.includes(flatIdentity[0]))
+            {
+                port.write(element.ledId-1+",", function (err, data) {
+    
+                    if (err) {
+                        console.log("Error");
+                    } 
+                });
+            }
+        });   
+        port.write(".", function (err, data) {
+    
+            if (err) {
+                console.log("Error");
+            } else {
+                arduinoState=1;
+                arduinoStateMessage="Arduino : GROUP STATUS CHANGE";
+                console.log("CMD : GROUP STATUS UPDATE");
+            }
+        });
+}
 function showAllOn() {
     port.write("6,.", function (err, data) {
 
