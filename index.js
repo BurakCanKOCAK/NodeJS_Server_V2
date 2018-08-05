@@ -199,7 +199,7 @@ app.get('/api/flat/:flatId/:status',(req,res)=>{
         flatStatus(flatId,"2")
     }else if(req.params.status=="sell"){
         databaseCache.forEach(element => {
-            if(element.buildingId==flatId[0] && element.flatId== flatId[1])
+            if(element.buildingId.includes(flatIdentity[0]) && element.flatId== flatId[1])
             {
                 db.prepare('UPDATE modelData SET isSold=1 Where ledId=?').run(element.ledId);
                 databaseCache = db.prepare("SELECT buildingId,flatId,ledId,isSold FROM modelData").all();        
@@ -209,7 +209,7 @@ app.get('/api/flat/:flatId/:status',(req,res)=>{
         flatStatus(flatId,"3")
     }else if(req.params.status=="onsale"){
         databaseCache.forEach(element => {
-            if(element.buildingId==flatId[0] && element.flatId== flatId[1])
+            if(element.buildingId.includes(flatIdentity[0]) && element.flatId== flatId[1])
             {
                 db.prepare('UPDATE modelData SET isSold=0 Where ledId=?').run(element.ledId);
                 databaseCache = db.prepare("SELECT buildingId,flatId,ledId,isSold FROM modelData").all();        
@@ -421,8 +421,8 @@ function initDB() {
     //var count = db.prepare("SELECT count(*) FROM user").get();
     databaseCache = db.prepare("SELECT buildingId,flatId,ledId,isSold FROM modelData").all();
     console.log("Records found : " + databaseCache.length);
-    console.log(databaseCache[0]);
     console.log("Database initialized");
+    console.log("--------------------------------------------------------------------");
 }
 
 function closeDb() {
