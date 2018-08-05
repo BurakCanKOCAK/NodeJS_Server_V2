@@ -281,7 +281,6 @@ function flatStatus(flatIdentity,flatStatus)
         } else {
             arduinoState=1;
             arduinoStateMessage="Arduino : FLAT STATUS CHANGE";
-            console.log("CMD : FLAT STATUS UPDATE");
         }
     });
 
@@ -297,6 +296,7 @@ function flatStatus(flatIdentity,flatStatus)
             });
         }
     });   
+
     port.write(".", function (err, data) {
 
         if (err) {
@@ -317,7 +317,6 @@ function buildingStatus(flatIdentity,flatStatus){
             } else {
                 arduinoState=1;
                 arduinoStateMessage="Arduino : GROUP STATUS CHANGE";
-                console.log("CMD : GROUP STATUS UPDATE");
             }
         });
     
@@ -325,6 +324,7 @@ function buildingStatus(flatIdentity,flatStatus){
         databaseCache.forEach(element => {
             if(element.buildingId.includes(flatIdentity[0]))
             {
+                console.log(element.ledId-1);
                 port.write(element.ledId-1+",", function (err, data) {
     
                     if (err) {
@@ -333,6 +333,7 @@ function buildingStatus(flatIdentity,flatStatus){
                 });
             }
         });   
+        
         port.write(".", function (err, data) {
     
             if (err) {
