@@ -51,19 +51,19 @@
       <button type="button" class="btn btn-success" id="add-btn">Add</button>
       <button id="edit-btn">Edit</button>
     </td>
-    <td>        </td>
+    <td> </td>
     <td class="ledTestId">
-        <input class="form-control input-sm" type="text" id="ledTestId-field" placeholder="[TEST] Led Id" />
-      </td>
-      <td class="on">
-        <button type="button" class="btn btn-primary" id="on-btn">ON</button>
-      </td>
-      <td class="off">
-        <button type="button" class="btn btn-primary" id="off-btn">OFF</button>
-      </td>
+      <input class="form-control input-sm" type="text" id="ledTestId-field" placeholder="[TEST] Led Id" />
+    </td>
+    <td class="on">
+      <button type="button" class="btn btn-success" onclick="led_test_on()" id="on-btn">ON</button>
+    </td>
+    <td class="off">
+      <button type="button" class="btn btn-danger" onclick="led_test_off()" id="off-btn">OFF</button>
+    </td>
   </table>
   <table>
-  
+
   </table>
   <table class="table table-striped table-hover table-condensed">
     <thead>
@@ -96,11 +96,9 @@
 
 
   <!-- Footer -->
-  <div class="footer">
-    <p>
-      <b>Copyright@2018 - Model Control V1.2 by PATYO Mimarlik Ankara/TURKEY</b>
-    </p>
-  </div>
+  <p>
+    <b>&copy; 2018 - Model Control V1.2 by PATYO Mimarlik Ankara/TURKEY</b>
+  </p>
 
 </div>
 
@@ -131,6 +129,15 @@
     // Sets callbacks to the buttons in the list
     refreshCallbacks();
 
+    //Test led ON/OFF functions
+    function led_test_off() {
+      socket.emit('led_test_off', testLedId.val());
+    }
+
+    function led_test_on() {
+      socket.emit('led_test_on', testLedId.val());
+    }
+
     //Add button
     addBtn.click(function () {
       socket.emit('led_add', {
@@ -141,12 +148,13 @@
     });
 
     onBtn.click(function () {
-      socket.emit('led_test_on',testLedId.val());
+      //socket.emit('led_test_on',testLedId.val());
     });
 
     offBtn.click(function () {
-      socket.emit('led_test_off',testLedId.val());
+      //socket.emit('led_test_off',testLedId.val());
     });
+
     //Edit button
     editBtn.click(function () {
       var item = contactList.get('id', idField.val())[0];
@@ -211,7 +219,7 @@
     function showAlreadyOnTheListPopupMessage(data) {
       console.log(data);
       try {
-        alert("LedId is already in use ! \nBuildingId = " + data.buildingId + " \nFlatId = " + data.flatId);        
+        alert("LedId is already in use ! \nBuildingId = " + data.buildingId + " \nFlatId = " + data.flatId);
       } catch (error) {
         alert("LedId value is incorrect !");
       }
@@ -221,8 +229,8 @@
 
   <!--AJAX + JS SCRIPT  For Socket.io!-->
   <script>
-    var socket = io('http://192.168.1.20:8484');
-    var server_address = "http://192.168.1.20:8484"
+    var socket = io('http://192.168.1.76:8484');
+    var server_address = "http://192.168.1.76:8484"
 
     //When data arrives on socket.io
     socket.on('data', function (data) {
