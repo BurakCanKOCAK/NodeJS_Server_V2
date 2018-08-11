@@ -7,6 +7,7 @@
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8/jquery.min.js"></script>
   <script src="//cdnjs.cloudflare.com/ajax/libs/list.js/1.5.0/list.min.js"></script>
+  <title>Model Control Configuration</title>
 </head>
 
 <style>
@@ -32,6 +33,15 @@
     text-align: center;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   }
+
+  .container .content {
+    position: absolute; /* Position the background text */
+    bottom: 0; /* At the bottom. Use top:0 to append it to the top */
+    background: rgba(0, 0, 0, 0.5); /* Black background with 0.5 opacity */
+    color: #f1f1f1; /* Grey text */
+    width: 100%; /* Full width */
+    padding: 20px; /* Some padding */
+}
 </style>
 
 
@@ -96,9 +106,9 @@
 
 
   <!-- Footer -->
-  <p>
-    <b>&copy; 2018 - Model Control V1.2 by PATYO Mimarlik Ankara/TURKEY</b>
-  </p>
+  <div class="content">
+    <p><center>&copy; 2018 - Model Control V1.2 by PATYO Mimarlik Ankara/TURKEY</center></p>
+  </div>
 
 </div>
 
@@ -229,8 +239,8 @@
 
   <!--AJAX + JS SCRIPT  For Socket.io!-->
   <script>
-    var socket = io('http://192.168.1.20:8484');
-    var server_address = "http://192.168.1.20:8484"
+    var socket = io('http://192.168.1.57:8484');
+    var server_address = "http://192.168.1.57:8484"
 
     //When data arrives on socket.io
     socket.on('data', function (data) {
