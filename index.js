@@ -5,16 +5,17 @@ const helmet = require('helmet');
 //express
 var express = require('express');
 var app = express();
+//app.use('/static', express.static(path.join(__dirname, 'public')))
 //io
 var server = require('http').Server(app);
 var io = require('socket.io')(server);
 //SerialPort
 var isSerialPortOpen = false;
-//0 : Not Connected | 1 : Connected | 2 : Error | 
+//0 : Not Connected | 1 : Connected | 2 : Error | 3: Init started | 4 : Init Completed | 5 : Waiting for Response
 var arduinoState = 0;
 var arduinoStateMessage = "";
 const SerialPort = require('serialport');
-var port = new SerialPort('/dev/ttyUSB0', {
+var port = new SerialPort('/dev/ttyACM0', {
     baudRate: 115200
 }, () => {
     console.log('SerialPort is opening....');
@@ -22,11 +23,11 @@ var port = new SerialPort('/dev/ttyUSB0', {
         isSerialPortOpen = true;
         arduinoState = 1;
         arduinoStateMessage = "Arduino is connected";
-        console.log('SerialPort is Open');
+        console.log('Arduino is connected !');
     } else {
         isSerialPortOpen = false;
         arduinoStateMessage = "Arduino is not connected";
-        console.log('SerialPort is not Open');
+        console.log('Arduino is not connected !');
     }
 });
 const parsers = SerialPort.parsers;
@@ -87,29 +88,43 @@ setTimeout(initArduino, 4000);
 
 function initArduino() {
     if (port.isOpen) {
-        port.write("8,", function (err, data) {
-            if (err) {
-                console.log("Error :", err);
-                arduinoState = 2;
-                arduinoStateMessage = "Error while initializing arduino !";
-                return console.log('Error on write: ', err.message);
-            } else {
-                arduinoState = 1;
-                arduinoStateMessage = "Arduino initialized...[8]";
-                setTimeout(showAllOff, 4000);
-                console.log("Data Sent : " + data);
-            }
-        });
-        //Init arduino by sending data
+        if (arduinoState == 1) {
+            port.write("I", function (err, data) {
+                if (err) {
+                    console.log("Error");
+                } else {
+                    arduinoState = 5;
+                    arduinoStateMessage = "START_INIT SENT TO ARDUINO";
+                    console.log("ARDUINO_START_INIT_CMD");
+                }
+            });
+            setTimeout(initArduino, 2000);
+        } else if(arduinoState==4) {
+            port.write("8,", function (err, data) {
+                if (err) {
+                    console.log("Error :", err);
+                    arduinoState = 2;
+                    arduinoStateMessage = "Error while initializing arduino !";
+                    return console.log('Error on write: ', err.message);
+                } else {
+                    arduinoState = 1;
+                    arduinoStateMessage = "Arduino initialized...[8]";
+                    setTimeout(showAllOff, 4000);
+                    console.log("Data Sent : " + data);
+                }
+            });
+            //Init arduino by sending data
+        }
     } else {
         console.log("Connection failed with Arduino...Retrying in 4seconds !");
         setTimeout(openArduinoPort, 1500);
         setTimeout(initArduino, 4000);
     }
+
 }
 
 function openArduinoPort() {
-    port = new SerialPort('/dev/ttyUSB0', {
+    port = new SerialPort('/dev/ttyACM0', {
         baudRate: 115200
     }, () => {
         console.log('SerialPort is opening....');
@@ -117,13 +132,13 @@ function openArduinoPort() {
             isSerialPortOpen = true;
             arduinoState = 1;
             arduinoStateMessage = "Arduino is connected";
-            console.log('SerialPort is Open');
+            console.log('Arduino connected !');
             setTimeout(showAllOff, 4000);
         } else {
             isSerialPortOpen = false;
             arduinoState = 0;
             arduinoStateMessage = "Arduino is not connected";
-            console.log('SerialPort is not Open');
+            console.log('Arduino is not detected !');
         }
     });
 }
@@ -255,11 +270,36 @@ initDB();
 // Functions
 function arduinoMessageHandler(data) {
     console.log("Data Received : " + data);
+    if (arduinoState!=3 && data == "sendLedCount") {
+        var cache=String(databaseCache.length)+".";
+        port.write(cache, function (err, data) {
+            if (err) {
+                console.log("Error while sending led count");
+            } else {
+                arduinoStateMessage = "LED_COUNT_SENT_TO_ARDUINO";
+                console.log("LED_COUNT_SENT_TO_ARDUINO");
+            }
+        });
+    }else if(arduinoState!=3 && data=="I_OK"){
+        arduinoState=3;
+        console.log("ARDUINO_INIT_STARTED");
+        setTimeout(initArduino, 45000);
+    }else if(arduinoState==3){
+        //Init data request handler
+        var row=db.prepare("SELECT buildingId,flatId,isSold FROM modelData Where ledId=?").get(Integer(data)+1);
+        data2Send=row.isSold+".";
+        port.write(String(data2Send), function (err, data) {
+            if (err) {
+                console.log("Error while sending led count");
+            } else {
+                console.log(data2Send+" Sent");
+            }
+        });
+    }
 }
 
 function showAllOff() {
     port.write("7,.", function (err, data) {
-
         if (err) {
             console.log("Error");
         } else {
@@ -368,7 +408,7 @@ function showEffect() {
 }
 
 function showOnSale() {
-    port.write("5", function (err, data) {
+    port.write("5,.", function (err, data) {
 
         if (err) {
             console.log("Error");
