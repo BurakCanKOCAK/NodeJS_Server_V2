@@ -30,16 +30,19 @@ int randNumber;
 int mode = 0;
 
 boolean isSold[530];
-string flatId[530];
+String flatId[530];
 
 int numberOfLeds = 0;
 
 boolean firstData = true;
-int dataCount = 0;
-int receivedLedId = 0;
 boolean dataReceiveInProgress = false;
 boolean initMode = false;
-int receivedData = ;
+boolean waitingForData = false;
+boolean waitingForLedCount = false;
+int dataCount = 0;
+int receivedLedId = 0;
+int receivedData = 0;
+int latestledIndex = 0;
 String receivedDataStr = "";
 //boolean flatlist[100];
 //String onSaleList[198];
@@ -59,31 +62,56 @@ void loop()
   if (Serial.available() > 0)
   {
     int data_received = Serial.read();
-    ///Serial.print("I received: ");
-    //Serial.println(data_rec_array,DEC);
-    ///Serial.println(data_received,DEC);
+    //Serial.print("I received: ");
+    //Serial.println(data_received, DEC);
     if (initMode)
     {
-      while (data_received != 46)
+
+      if (waitingForLedCount)
       {
-        receivedData = (receiveData * 10) + (data_received - 48);
-        data_received = Serial.read();
-      }
-      numberOfLeds = receiveData;
-      if (data_received == 46)
-      {
-        for (int i = 0; i < numberOfLeds; i++)
+        if (data_received == 46)
         {
-          Serial.println(i);
-          data_received = Serial.read();
-          while (data_Received != 46)
-          {
-            receivedData = (receiveData * 10) + (data_received - 48);
-            data_received = Serial.read();
-          }
-          isSold[i] = receivedData;
+          //NOKTA GELME DURUMU
+          numberOfLeds = receivedData;
+          waitingForLedCount = false;
+          waitingForData = true;
+          receivedData = 0;
+          initArduinoStart();
+          Serial.println(latestledIndex);
+        }
+        else
+        {
+          //NUMARA GELME DURUMU
+          receivedData = (receivedData * 10) + (data_received - 48);
         }
       }
+      else if (waitingForData)
+      {
+        if (data_received == 46)
+        {
+          //NOKTA GELME DURUMU
+          isSold[latestledIndex] = receivedData;
+          latestledIndex++;
+          if (latestledIndex == numberOfLeds)
+          {
+            waitingForData = false;
+            initMode = false;
+            receivedData = 0;
+            Serial.println("INIT_OK");
+            initArduinoFinish();
+          }
+          else
+          {
+            Serial.println(latestledIndex);
+          }
+        }
+        else
+        {
+          //NUMARA GELME DURUMU
+          receivedData = data_received - 48;
+        }
+      }
+      //------------------------------------------------
     }
     else
     {
@@ -106,14 +134,14 @@ void loop()
         else if (data_received == 51)
         {
           //SELL
-          Serial.println("LEDOFF");
+          Serial.println("SOLD");
           mode = 3;
           dataReceiveInProgress = true;
         }
         else if (data_received == 52)
         {
           //ONSALE
-          Serial.println("LEDOFF");
+          Serial.println("ONSALE");
           mode = 4;
           dataReceiveInProgress = true;
         }
@@ -160,6 +188,7 @@ void loop()
           //I : Init request
           initMode = true;
           Serial.println("sendLedCount");
+          waitingForLedCount = true;
         }
       }
       else if (dataReceiveInProgress == true && data_received == 46)
@@ -202,12 +231,14 @@ void loop()
           //Sell
           //Serial.println("FLAT SOLD");
           leds[receivedLedId] = CRGB(255, 1, 1);
+          isSold[receivedLedId] = 1;
         }
         else if (mode == 4)
         {
           //OnSale
           //Serial.println("FLAT ONSALE");
           leds[receivedLedId] = CRGB(10, 255, 10);
+          isSold[receivedLedId] = 0;
         }
         else if (mode == 5)
         {
@@ -303,7 +334,7 @@ void initArduinoFinish()
     leds[j] = CRGB(0, 0, 0);
   }
   FastLED.show();
-  Serial.println("9_OK");
+  Serial.println("ARDUINO_INIT_FINISHED");
 }
 
 void startup(int Red, int Green, int Blue)

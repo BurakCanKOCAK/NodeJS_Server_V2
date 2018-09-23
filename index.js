@@ -84,36 +84,21 @@ for (var i = 0; i < count['count(*)']; i++) {
 */
 
 //--------------------------------------------------------//
-setTimeout(initArduino, 4000);
+setTimeout(initArduino, 2500);
 
 function initArduino() {
     if (port.isOpen) {
         if (arduinoState == 1) {
             port.write("I", function (err, data) {
                 if (err) {
-                    console.log("Error");
+                    setTimeout(initArduino, 2000);
+                    console.log("Error while arduino initialization");
                 } else {
                     arduinoState = 5;
                     arduinoStateMessage = "START_INIT SENT TO ARDUINO";
                     console.log("ARDUINO_START_INIT_CMD");
                 }
             });
-            setTimeout(initArduino, 2000);
-        } else if(arduinoState==4) {
-            port.write("8,", function (err, data) {
-                if (err) {
-                    console.log("Error :", err);
-                    arduinoState = 2;
-                    arduinoStateMessage = "Error while initializing arduino !";
-                    return console.log('Error on write: ', err.message);
-                } else {
-                    arduinoState = 1;
-                    arduinoStateMessage = "Arduino initialized...[8]";
-                    setTimeout(showAllOff, 4000);
-                    console.log("Data Sent : " + data);
-                }
-            });
-            //Init arduino by sending data
         }
     } else {
         console.log("Connection failed with Arduino...Retrying in 4seconds !");
@@ -270,31 +255,31 @@ initDB();
 // Functions
 function arduinoMessageHandler(data) {
     console.log("Data Received : " + data);
-    if (arduinoState!=3 && data == "sendLedCount") {
-        var cache=String(databaseCache.length)+".";
+    if (arduinoState != 3 && data == "sendLedCount") {
+        var cache = String(databaseCache.length) + ".";
         port.write(cache, function (err, data) {
             if (err) {
                 console.log("Error while sending led count");
             } else {
                 arduinoStateMessage = "LED_COUNT_SENT_TO_ARDUINO";
                 console.log("LED_COUNT_SENT_TO_ARDUINO");
+                arduinoState = 3;
             }
         });
-    }else if(arduinoState!=3 && data=="I_OK"){
-        arduinoState=3;
-        console.log("ARDUINO_INIT_STARTED");
-        setTimeout(initArduino, 45000);
-    }else if(arduinoState==3){
+    } else if (arduinoState == 3 && data != "INIT_OK") {
         //Init data request handler
-        var row=db.prepare("SELECT buildingId,flatId,isSold FROM modelData Where ledId=?").get(Integer(data)+1);
-        data2Send=row.isSold+".";
+        var row = db.prepare("SELECT buildingId,flatId,isSold FROM modelData Where ledId=?").get(Integer(data) + 1);
+        data2Send = row.isSold + ".";
         port.write(String(data2Send), function (err, data) {
             if (err) {
                 console.log("Error while sending led count");
             } else {
-                console.log(data2Send+" Sent");
+                console.log(data2Send + " Sent");
             }
         });
+    } else if (arduinoState==3 && data == "INIT_OK") {
+        arduinoState=4;
+        console.log("Arduino Initialized");
     }
 }
 
@@ -415,27 +400,6 @@ function showOnSale() {
         } else {
             arduinoState = 1;
             arduinoStateMessage = "Arduino : SHOW ONSALE";
-        }
-    });
-
-    databaseCache.forEach(element => {
-        if (element.isSold == 1) {
-            port.write(element.ledId - 1 + ",", function (err, data) {
-
-                if (err) {
-                    console.log("Error");
-                }
-            });
-        }
-    });
-    port.write(".", function (err, data) {
-
-        if (err) {
-            console.log("Error");
-        } else {
-            arduinoState = 1;
-            arduinoStateMessage = "Arduino : SHOW ONSALE";
-            console.log("CMD : SHOW ONSALE");
         }
     });
 }
