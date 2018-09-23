@@ -256,7 +256,9 @@ initDB();
 function arduinoMessageHandler(data) {
     console.log("Data Received : " + data);
     if (arduinoState != 3 && data == "sendLedCount") {
+        console.log("Sending led count");
         var cache = String(databaseCache.length) + ".";
+        console.log("Cache : "+cache);
         port.write(cache, function (err, data) {
             if (err) {
                 console.log("Error while sending led count");
