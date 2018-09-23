@@ -97,7 +97,7 @@ void loop()
             waitingForData = false;
             initMode = false;
             receivedData = 0;
-            Serial.println("INIT_OK");
+            Serial.print("INIT_OK");
             initArduinoFinish();
           }
           else
@@ -187,7 +187,7 @@ void loop()
         {
           //I : Init request
           initMode = true;
-          Serial.println("sendLedCount");
+          Serial.print("sendLedCount");
           waitingForLedCount = true;
         }
       }
