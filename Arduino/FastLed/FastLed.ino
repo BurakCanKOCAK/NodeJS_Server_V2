@@ -97,7 +97,8 @@ void loop()
             waitingForData = false;
             initMode = false;
             receivedData = 0;
-            Serial.print("INIT_OK");
+            latestledIndex = 0;
+            Serial.println("INIT_OK");
             initArduinoFinish();
           }
           else
@@ -187,7 +188,7 @@ void loop()
         {
           //I : Init request
           initMode = true;
-          Serial.print("sendLedCount");
+          Serial.println("sendLedCount");
           waitingForLedCount = true;
         }
       }
@@ -243,10 +244,10 @@ void loop()
         else if (mode == 5)
         {
           //Show OnSale
-          if (dataCount != 0)
-          {
-            leds[receivedLedId] = CRGB(255, 1, 1);
-          }
+          //if (dataCount != 0)
+          //{
+          //  leds[receivedLedId] = CRGB(255, 1, 1);
+          //}
         }
         else if (mode == 6)
         {
@@ -307,10 +308,12 @@ void setShowOnSale()
   {
     if (isSold[j] == 1)
     {
+      //Serial.println("Sold");
       leds[j] = CRGB(255, 1, 1);
     }
     else
     {
+      //Serial.println("Onsale");
       leds[j] = CRGB(1, 255, 1);
     }
   }
@@ -323,7 +326,7 @@ void initArduinoStart()
     leds[j] = CRGB(182, 95, 13);
   }
   FastLED.show();
-  Serial.println("ARDUINO_INIT_STARTED");
+  //Serial.println("ARDUINO_INIT_STARTED");
   //delay(3000);
 }
 
@@ -334,7 +337,7 @@ void initArduinoFinish()
     leds[j] = CRGB(0, 0, 0);
   }
   FastLED.show();
-  Serial.println("ARDUINO_INIT_FINISHED");
+  //Serial.println("ARDUINO_INIT_FINISHED");
 }
 
 void startup(int Red, int Green, int Blue)

@@ -1,3 +1,6 @@
+//Author : BBH
+//Version : 2.0
+
 //bodyparser
 const bodyParser = require('body-parser');
 //helmet
@@ -84,6 +87,8 @@ for (var i = 0; i < count['count(*)']; i++) {
 */
 
 //--------------------------------------------------------//
+initDB();
+server.listen(8484);
 setTimeout(initArduino, 2500);
 
 function initArduino() {
@@ -94,7 +99,7 @@ function initArduino() {
                     setTimeout(initArduino, 2000);
                     console.log("Error while arduino initialization");
                 } else {
-                    arduinoState = 5;
+                    arduinoState = 3;
                     arduinoStateMessage = "START_INIT SENT TO ARDUINO";
                     console.log("ARDUINO_START_INIT_CMD");
                 }
@@ -248,14 +253,13 @@ app.get('/api/commercial/:commercialId/:status', (req, res) => {
     initDB();
  })
  */
-server.listen(8484);
-initDB();
+
 
 
 // Functions
 function arduinoMessageHandler(data) {
     console.log("Data Received : " + data);
-    if (arduinoState != 3 && data == "sendLedCount") {
+    if (arduinoState == 3 && data == "sendLedCount\r") {
         console.log("Sending led count");
         var cache = String(databaseCache.length) + ".";
         console.log("Cache : "+cache);
@@ -268,10 +272,15 @@ function arduinoMessageHandler(data) {
                 arduinoState = 3;
             }
         });
-    } else if (arduinoState == 3 && data != "INIT_OK") {
+    } else if (arduinoState == 3 && data != "INIT_OK\r") {
         //Init data request handler
-        var row = db.prepare("SELECT buildingId,flatId,isSold FROM modelData Where ledId=?").get(Integer(data) + 1);
-        data2Send = row.isSold + ".";
+        var row = db.prepare("SELECT buildingId,flatId,isSold FROM modelData Where ledId=?").get(parseInt(data.replace("\r","")) + 1);
+        if(row==undefined){
+            data2Send =  "0.";
+        }else{
+            data2Send = row.isSold + ".";
+        }
+       
         port.write(String(data2Send), function (err, data) {
             if (err) {
                 console.log("Error while sending led count");
@@ -408,18 +417,10 @@ function showOnSale() {
 
 
 function initDB() {
-    db.prepare("CREATE TABLE if not exists user (ROWID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,flatId INT, info TEXT)").run();
     db.prepare("CREATE TABLE if not exists modelData (buildingId TEXT,flatId INT,ledId INTEGER PRIMARY KEY NOT NULL, isSold INTEGER DEFAULT 0)").run();
     var check;
     var ROWID = null;
-    var stmt = db.prepare("INSERT INTO user VALUES (" + ROWID + ",?,?)");
-    /*for (var i = 0; i < 2; i++) {
-        var d = new Date();
-        var n = d.toLocaleTimeString();
-        stmt.run(n, "User" + i);
-    }
-    */
-    //var count = db.prepare("SELECT count(*) FROM user").get();
+    
     databaseCache = db.prepare("SELECT buildingId,flatId,ledId,isSold FROM modelData").all();
     console.log("Records found : " + databaseCache.length);
     console.log("Database initialized");
