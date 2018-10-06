@@ -8,7 +8,7 @@ const helmet = require('helmet');
 //express
 var express = require('express');
 var app = express();
-//app.use('/static', express.static(path.join(__dirname, 'public')))
+app.use(express.static(__dirname + '/static'));
 //io
 var server = require('http').Server(app);
 var io = require('socket.io')(server);
@@ -216,6 +216,7 @@ app.get('/api/flat/:flatId/:status', (req, res) => {
             if (element.buildingId.includes(flatId[0]) && element.flatId == flatId[1]) {
                 db.prepare('UPDATE modelData SET isSold=0 Where ledId=?').run(element.ledId);
                 databaseCache = db.prepare("SELECT buildingId,flatId,ledId,isSold FROM modelData").all();
+                
             }
         });
         flatStatus(flatId, "4")
@@ -460,6 +461,7 @@ io.on('connection', function (socket) {
     })
 
     socket.on("led_test_on", function (data) {
+        console.log("led_test_on");
         port.write("1", function (err, data) {
 
             if (err) {
@@ -495,6 +497,7 @@ io.on('connection', function (socket) {
     })
 
     socket.on("led_test_off", function (data) {
+        console.log("led_test_off");
         port.write("2", function (err, data) {
 
             if (err) {
