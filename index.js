@@ -1,6 +1,8 @@
 //Author : BBH
 //Version : 2.0
 
+//Config
+var config = require("./config.json");
 //bodyparser
 const bodyParser = require('body-parser');
 //helmet
@@ -88,7 +90,8 @@ for (var i = 0; i < count['count(*)']; i++) {
 
 //--------------------------------------------------------//
 initDB();
-server.listen(8484);
+server.listen(config.port_ap);
+console.log("Server started http://"+config.ip_address_ap+":"+config.port_ap)
 setTimeout(initArduino, 2500);
 
 function initArduino() {
