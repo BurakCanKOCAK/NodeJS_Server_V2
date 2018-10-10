@@ -61,6 +61,8 @@ var databaseCache;
 var saleList = [];
 var flatList = [];
 
+setInterval(() => db.checkpoint(), 10000).unref();
+
 //Checks if variable exists or not
 function isset(accessor) {
     try {
@@ -91,7 +93,7 @@ for (var i = 0; i < count['count(*)']; i++) {
 //--------------------------------------------------------//
 initDB();
 server.listen(config.port_ap);
-console.log("Server started http://"+config.ip_address_ap+":"+config.port_ap)
+console.log("Server started http://localhost"+":"+config.port_ap)
 setTimeout(initArduino, 2500);
 
 function initArduino() {

@@ -250,9 +250,10 @@
 
   <!--AJAX + JS SCRIPT  For Socket.io!-->
   <script>
-    var server_address = "http://192.168.1.57:8484"
+    var json = $.getJSON("../.config.json");
+    var server_address = "http://localhost:8484";
     var socket = io(server_address);
-
+    console.log(server_address);
 
     //When data arrives on socket.io
     socket.on('data', function (data) {

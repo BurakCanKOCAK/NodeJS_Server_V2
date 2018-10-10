@@ -15,14 +15,18 @@ max-lease-time 7200;
 
 log-facility local7;
 
-option domain-name "ChanaMasala.local";
-option domain-name-servers dns.ChanaMasala.local;
+option domain-name "PatyoNetMan.local";
+option domain-name-servers dns.PatyoNetMan.local;
 default-lease-time 600;
 max-lease-time 7200;
 authoritative;
 log-facility local7;
-subnet 192.168.100.0 netmask 255.255.255.0
-{ range 192.168.100.100 192.168.100.200; }
+subnet 192.168.0.0 netmask 255.255.255.0
+{ 
+  pool{
+      range 192.168.0.100 192.168.0.200;    <-- clients will get IP addresses in this range
+  }
+}
 
 
 
@@ -33,21 +37,21 @@ apt-get -y install hostapd isc-dhcp-server
 cat >> /etc/network/interfaces <<DELIM
 allow-hotplug wlan0
 iface wlan0 inet static
-address 192.168.100.1
+address 192.168.0.1
 netmask 255.255.255.0
 DELIM
 
 cat > /etc/hostapd/hostapd.conf <<DELIM
 interface=wlan0
 driver=nl80211
-ssid=Pedal_interface
+ssid=PatyoModel
 hw_mode=g
 channel=6
 macaddr_acl=0
 auth_algs=1
 ignore_broadcast_ssid=0
 wpa=2
-wpa_passphrase=yamsaregood
+wpa_passphrase=patyobbh
 wpa_key_mgmt=WPA-PSK
 wpa_pairwise=TKIP
 rsn_pairwise=CCMP
@@ -61,19 +65,21 @@ then
   cp /etc/dhcp/dhcpd.conf /etc/dhcp/dhcpd.conf.orig
 fi
 cat > /etc/dhcp/dhcpd.conf <<DELIM
-option domain-name "Pedal_interface.local";
-option domain-name-servers dns.Pedal_interface.local;
+option domain-name "PatyoModel.local";
+option domain-name-servers dns.PatyoModel.local;
 default-lease-time 600;
 max-lease-time 7200;
 authoritative;
 log-facility local7;
-subnet 192.168.100.0 netmask 255.255.255.0 {
-range 192.168.100.100 192.168.100.200;    <-- clients will get IP addresses in this range
+subnet 192.168.0.0 netmask 255.255.255.0 {
+  pool{
+      range 192.168.0.100 192.168.0.200;    <-- clients will get IP addresses in this range
+  }
 }
 
 DELIM
 
-(for i in $(seq 100 200); do echo 192.168.100.$i client$i; done) >> /etc/hosts
+(for i in $(seq 100 200); do echo 192.168.0.$i client$i; done) >> /etc/hosts
 
 reboot
 #check dhcpd config with
