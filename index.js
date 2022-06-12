@@ -92,7 +92,7 @@ for (var i = 0; i < count['count(*)']; i++) {
 
 //--------------------------------------------------------//
 initDB();
-server.listen(config.port_ap);
+server.listen(config.port_ap,'0.0.0.0');
 console.log("Server started http://localhost"+":"+config.port_ap)
 setTimeout(initArduino, 2500);
 
